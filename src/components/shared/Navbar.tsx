@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
   { label: "Accueil", href: "/", cursor: "Home" },
@@ -11,20 +14,27 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[rgba(239,226,217,0.88)] backdrop-blur-xl">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link
           href="/"
           data-cursor-label="Home"
-          className="flex items-center gap-3 text-2xl font-black tracking-tight text-[var(--ink)]"
+          className="flex items-center gap-4 text-3xl font-black tracking-tight text-[var(--ink)]"
         >
           <Image
             src="/insat-press-logo.png"
             alt="INSAT Press logo"
-            width={36}
-            height={36}
-            className="h-10 w-10 object-contain"
+            width={44}
+            height={44}
+            className="h-11 w-11 object-contain"
             priority
           />
 
@@ -33,23 +43,33 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden items-center gap-8 text-sm font-bold text-[var(--muted)] md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              data-cursor-label={link.cursor}
-              className="text-[var(--muted)] transition-colors duration-200 hover:!text-[var(--press-red)]"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="hidden items-center gap-8 text-sm font-bold md:flex">
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                data-cursor-label={link.cursor}
+                className={`transition-colors duration-200 ${
+                  active
+                    ? "!text-[var(--press-red)]"
+                    : "!text-[var(--muted)] hover:!text-[var(--press-red)]"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         <Link
           href="/join"
           data-cursor-label="Join"
-          className="btn-editorial btn-editorial-sm"
+          className={`btn-editorial btn-editorial-sm ${
+            isActive("/join") ? "!bg-[var(--press-red)] !text-[var(--cream)]" : ""
+          }`}
         >
           Join Us
         </Link>

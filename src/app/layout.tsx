@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond, Caveat } from "next/font/google";
 import CustomCursor from "@/components/CustomCursor";
 import "./globals.css";
+import Footer from "@/components/shared/Footer";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${cormorant.variable} ${caveat.variable}`}>
         <CustomCursor />
         {children}
+        <Footer />
       </body>
     </html>
   );

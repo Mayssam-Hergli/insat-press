@@ -20,8 +20,9 @@ const board = [
 ];
 
 const webmasters = [
-  { name: "Israa Soudani", initials: "IS" },
+ 
   { name: "Mayssam Hergli", initials: "MH" },
+   { name: "Israa Soudani", initials: "IS" },
 ];
 
 export default function AboutPage() {
