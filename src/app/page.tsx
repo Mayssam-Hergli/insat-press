@@ -91,18 +91,17 @@ export default function Home() {
       </span>
     </Link>
 
-    <div className="hidden items-center gap-8 text-sm font-bold text-[var(--muted)] md:flex">
-      {navLinks.map((link) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          data-cursor-label={link.cursor}
-          className="transition hover:text-[var(--press-red)]"
-        >
-          {link.label}
-        </Link>
-      ))}
-    </div>
+<div className="hidden items-center gap-8 text-sm font-bold text-[var(--muted)] md:flex">
+  {navLinks.map((link) => (
+    <Link
+      key={link.href}
+      href={link.href}
+      data-cursor-label={link.cursor}
+      className="text-[var(--muted)] transition-colors duration-200 hover:!text-[var(--press-red)]"    >
+      {link.label}
+    </Link>
+  ))}
+</div>
 
     <Link
       href="/join"
