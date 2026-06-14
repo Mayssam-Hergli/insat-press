@@ -1,5 +1,5 @@
 import Navbar from "@/components/shared/Navbar";
-
+import PageTitle from "@/components/shared/PageTitle";
 const activities = [
   "Writing articles and creative pieces",
   "Covering events through photography and media",
@@ -32,14 +32,7 @@ export default function AboutPage() {
 
       <section className="px-6 py-10 md:px-12 lg:px-20">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-10">
-            <h1 className="font-serif-display bg-[linear-gradient(90deg,#821b16_0%,#9e2d27_35%,#b9433a_65%,#d2766c_100%)] bg-clip-text pb-3 text-5xl font-bold leading-[1.08] text-transparent md:text-6xl lg:text-7xl">
-              About Us
-            </h1>
-
-            <div className="mt-4 h-[1px] w-full bg-[var(--line)]" />
-          </div>
-
+         <PageTitle title="About Us" />
           <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
             <section className="rounded-[1.2rem] border border-[var(--line)] bg-[rgba(255,248,243,0.28)] p-6 md:p-8">
               <p className="font-hand text-5xl font-bold leading-none text-[var(--press-red)]">
