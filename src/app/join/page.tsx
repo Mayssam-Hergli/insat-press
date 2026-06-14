@@ -1,15 +1,6 @@
 import Navbar from "@/components/shared/Navbar";
-
-const recruitmentOpen = true;
-
-const departments = [
-  "Writing",
-  "Media",
-  "Photography",
-  "Design",
-  "Journalism",
-  "Podcast",
-];
+import PageTitle from "@/components/shared/PageTitle";
+import { siteConfig } from "@/data/siteConfig";
 
 const inputClass =
   "w-full rounded-xl border border-[var(--line)] bg-[rgba(255,248,243,0.38)] px-4 py-3 text-sm font-semibold text-[var(--ink)] outline-none transition placeholder:text-[rgba(106,85,77,0.55)] focus:border-[var(--press-red)] disabled:cursor-not-allowed disabled:opacity-55";
@@ -21,19 +12,15 @@ const descriptionClass =
   "text-lg font-semibold leading-8 text-[var(--ink)] md:text-xl";
 
 export default function JoinPage() {
+  const recruitmentOpen = siteConfig.recruitment.open;
+
   return (
     <main className="min-h-screen page-bg">
       <Navbar />
 
       <section className="px-6 py-10 md:px-12 lg:px-20">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-10">
-            <h1 className="font-serif-display bg-[linear-gradient(90deg,#821b16_0%,#9e2d27_35%,#b9433a_65%,#d2766c_100%)] bg-clip-text pb-3 text-5xl font-bold leading-[1.08] text-transparent md:text-6xl lg:text-7xl">
-              Join Us
-            </h1>
-
-            <div className="mt-4 h-[1px] w-full bg-[var(--line)]" />
-          </div>
+          <PageTitle title="Join Us" />
 
           {!recruitmentOpen && (
             <section className="mb-5 rounded-[1.2rem] border border-[var(--line)] bg-[rgba(255,248,243,0.32)] p-6 text-center md:p-8">
@@ -42,8 +29,7 @@ export default function JoinPage() {
               </p>
 
               <p className={`mx-auto mt-4 max-w-2xl ${descriptionClass}`}>
-                The application form will be available during the official INSAT
-                Press recruitment period. Stay tuned for announcements.
+                {siteConfig.recruitment.closedMessage}
               </p>
             </section>
           )}
@@ -141,7 +127,7 @@ export default function JoinPage() {
                       Choose a department
                     </option>
 
-                    {departments.map((department) => (
+                    {siteConfig.departments.map((department) => (
                       <option key={department} value={department}>
                         {department}
                       </option>
@@ -189,13 +175,11 @@ export default function JoinPage() {
                     : "Recruitment is closed. The form is currently disabled."}
                 </p>
 
-                <button
-                  type="button"
-                  disabled={!recruitmentOpen}
-                  className="btn-editorial disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0 disabled:hover:bg-[rgba(255,248,243,0.35)] disabled:hover:text-[var(--ink)] disabled:hover:shadow-none"
-                >
-                  {recruitmentOpen ? "Submit application" : "Recruitment closed"}
-                </button>
+                {recruitmentOpen && (
+                  <button type="submit" className="btn-editorial">
+                    Submit application
+                  </button>
+                )}
               </div>
             </form>
           </section>

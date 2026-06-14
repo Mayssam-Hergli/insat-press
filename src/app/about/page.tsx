@@ -82,9 +82,7 @@ export default function AboutPage() {
                 Executive board
               </p>
 
-              <h2 className="font-serif-display mt-3 text-4xl font-bold text-[var(--ink)]">
-                Current team
-              </h2>
+             
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

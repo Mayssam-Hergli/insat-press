@@ -10,11 +10,11 @@ export default function MediaPage() {
       <section className="px-6 py-10 md:px-12 lg:px-20">
         <div className="mx-auto max-w-6xl">
           <div className="mb-10">
-            <h1 className="font-serif-display bg-[linear-gradient(90deg,#821b16_0%,#9e2d27_35%,#b9433a_65%,#d2766c_100%)] bg-clip-text pb-3 text-5xl font-bold leading-[1.08] text-transparent md:text-6xl lg:text-7xl">
+            <h1 className="font-serif-display bg-[linear-gradient(90deg,#821b16_0%,#9e2d27_45%,#c45a50_75%,#d9877d_100%)] bg-clip-text pb-3 text-5xl font-bold leading-[1.08] text-transparent md:text-6xl lg:text-7xl">
               Media Coverage
             </h1>
 
-            <div className="mt-4 h-[1px] w-full bg-[var(--line)]" />
+            <div className="mt-3 h-[1px] w-full bg-[var(--line)]" />
           </div>
 
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
