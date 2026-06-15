@@ -18,7 +18,7 @@ export const siteConfig = {
   ],
 
   recruitment: {
-    open: false,
+    open: true,
     closedMessage:
       "The application form will be available during the official INSAT Press recruitment period. Stay tuned for announcements.",
   },

@@ -254,3 +254,26 @@ a {
   padding: 0.55rem 1.25rem;
   font-size: 0.875rem;
 }
+
+.gradient-title {
+  background: linear-gradient(
+    90deg,
+    #821b16 0%,
+    #9f2f28 32%,
+    #b9433a 58%,
+    #d2766c 82%,
+    #e2a198 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

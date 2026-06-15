@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Article } from "@/data/articles";
 
 type ArticleCardProps = {
@@ -7,10 +6,10 @@ type ArticleCardProps = {
 
 export default function ArticleCard({ article }: ArticleCardProps) {
   return (
-    <Link
+    <a
       href={`/writing/${article.slug}`}
       data-cursor-label="Read"
-      className="group block border-b border-[var(--line)] last:border-b-0 transition hover:bg-[rgba(255,248,243,0.38)]"
+      className="relative z-20 block border-b border-[var(--line)] last:border-b-0 transition hover:bg-[rgba(255,248,243,0.38)]"
     >
       <article className="flex items-center gap-5 px-5 py-4 md:px-7">
         <div className="min-w-0 flex-1">
@@ -21,7 +20,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             · {article.writer} · {article.date}
           </p>
 
-          <h2 className="mt-1.5 max-w-3xl text-2xl font-black leading-tight text-[var(--ink)] transition-colors group-hover:text-[var(--press-red)] md:text-[1.7rem]">
+          <h2 className="mt-1.5 max-w-3xl text-2xl font-black leading-tight text-[var(--ink)] transition-colors hover:text-[var(--press-red)] md:text-[1.7rem]">
             {article.title}
           </h2>
 
@@ -40,6 +39,6 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           </span>
         </div>
       </article>
-    </Link>
+    </a>
   );
 }

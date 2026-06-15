@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { MediaCoverage } from "@/data/mediaCoverage";
 
 type MediaCardProps = {
@@ -7,10 +6,10 @@ type MediaCardProps = {
 
 export default function MediaCard({ item }: MediaCardProps) {
   return (
-    <Link
-      href="#"
+    <a
+      href={`/media/${item.slug}`}
       data-cursor-label="View"
-      className="group block overflow-hidden rounded-[1.2rem] border border-[var(--line)] bg-[rgba(255,248,243,0.28)] transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[rgba(33,25,22,0.08)]"
+      className="relative z-20 block overflow-hidden rounded-[1.2rem] border border-[var(--line)] bg-[rgba(255,248,243,0.28)] transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[rgba(33,25,22,0.08)]"
     >
       <div className="flex h-40 items-center justify-center border-b border-[var(--line)] bg-[var(--sand)]">
         <span className="font-hand text-5xl font-bold text-[rgba(130,27,22,0.36)]">
@@ -23,7 +22,7 @@ export default function MediaCard({ item }: MediaCardProps) {
           {item.type}
         </p>
 
-        <h2 className="mt-3 text-2xl font-black leading-tight text-[var(--ink)] transition-colors group-hover:text-[var(--press-red)]">
+        <h2 className="mt-3 text-2xl font-black leading-tight text-[var(--ink)] transition-colors hover:text-[var(--press-red)]">
           {item.title}
         </h2>
 
@@ -39,6 +38,6 @@ export default function MediaCard({ item }: MediaCardProps) {
           View coverage →
         </p>
       </div>
-    </Link>
+    </a>
   );
 }
