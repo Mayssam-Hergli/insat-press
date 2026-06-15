@@ -1,5 +1,6 @@
 import Navbar from "@/components/shared/Navbar";
 import PageTitle from "@/components/shared/PageTitle";
+import { siteConfig } from "@/data/siteConfig";
 const activities = [
   "Writing articles and creative pieces",
   "Covering events through photography and media",
@@ -112,17 +113,11 @@ export default function AboutPage() {
             </h2>
 
             <div className="mt-7 flex flex-wrap justify-center gap-4">
-              <a href="#" className="btn-editorial">
-                Facebook
-              </a>
-
-              <a href="#" className="btn-editorial">
-                Instagram
-              </a>
-
-              <a href="#" className="btn-editorial">
-                LinkedIn
-              </a>
+              {siteConfig.socialLinks.map((link) => (
+                <a key={link.label} href={link.href} className="btn-editorial">
+                  {link.label}
+                </a>
+              ))}
             </div>
           </section>
 

@@ -25,6 +25,23 @@ export default function Footer() {
             </p>
           </div>
 
+          <div>
+            <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-[var(--press-red)]">
+              Navigate
+            </p>
+
+            <div className="flex flex-col gap-2">
+              {footerLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm font-semibold text-[var(--muted)] transition-colors hover:text-[var(--press-red)]"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="mt-8 flex flex-col gap-3 border-t border-[var(--line)] pt-5 text-sm font-semibold text-[var(--muted)] md:flex-row md:items-center md:justify-between">
