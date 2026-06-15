@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import PageTitle from "@/components/shared/PageTitle";
 import { events } from "@/data/events";
@@ -13,8 +14,10 @@ export default function EventsPage() {
 
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
-              <article
+              <Link
                 key={event.slug}
+                href={`/events/${event.slug}`}
+                data-cursor-label="Explore"
                 className="group overflow-hidden rounded-[1.2rem] border border-[var(--line)] bg-[rgba(255,248,243,0.28)] transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[rgba(33,25,22,0.08)]"
               >
                 <div className="flex h-40 items-center justify-center border-b border-[var(--line)] bg-[var(--sand)]">
@@ -39,8 +42,12 @@ export default function EventsPage() {
                   <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
                     {event.description}
                   </p>
+
+                  <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-[var(--press-red)]">
+                    Learn more →
+                  </p>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </div>

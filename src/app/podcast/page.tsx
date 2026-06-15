@@ -18,11 +18,15 @@ export default function PodcastPage() {
                 key={episode.slug}
                 className="flex flex-col gap-5 border-b border-[var(--line)] px-5 py-5 last:border-b-0 md:flex-row md:items-center md:px-7"
               >
-                <div className="flex h-24 w-full shrink-0 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--sand)] md:w-36">
+                <Link
+                  href={`/podcast/${episode.slug}`}
+                  data-cursor-label="Listen"
+                  className="flex h-24 w-full shrink-0 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--sand)] transition hover:opacity-80 md:w-36"
+                >
                   <span className="font-hand text-4xl font-bold text-[rgba(130,27,22,0.38)]">
                     {episode.coverLabel}
                   </span>
-                </div>
+                </Link>
 
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold text-[var(--muted)]">
@@ -32,9 +36,11 @@ export default function PodcastPage() {
                     · Guest: {episode.guest} · {episode.date}
                   </p>
 
-                  <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--ink)] md:text-[1.7rem]">
-                    {episode.title}
-                  </h2>
+                  <Link href={`/podcast/${episode.slug}`} data-cursor-label="Listen">
+                    <h2 className="mt-2 text-2xl font-black leading-tight text-[var(--ink)] transition-colors hover:text-[var(--press-red)] md:text-[1.7rem]">
+                      {episode.title}
+                    </h2>
+                  </Link>
 
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--muted)]">
                     {episode.description}
@@ -55,6 +61,14 @@ export default function PodcastPage() {
                       className="btn-editorial btn-editorial-sm"
                     >
                       Spotify
+                    </Link>
+
+                    <Link
+                      href={`/podcast/${episode.slug}`}
+                      data-cursor-label="Notes"
+                      className="btn-editorial btn-editorial-sm"
+                    >
+                      Show notes
                     </Link>
                   </div>
                 </div>

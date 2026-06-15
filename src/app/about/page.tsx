@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Navbar from "@/components/shared/Navbar";
 import PageTitle from "@/components/shared/PageTitle";
 import { siteConfig } from "@/data/siteConfig";
@@ -10,20 +11,20 @@ const activities = [
 ];
 
 const board = [
-  { role: "President", name: "Rima Ben Chaouacha", initials: "RBC" },
-  { role: "Vice President", name: "Ranim Benzaied", initials: "RB" },
-  { role: "Media Manager", name: "Mariem Maatoug", initials: "MM" },
-  { role: "Media Manager", name: "Koussay Djebbi", initials: "KD" },
-  { role: "Chief Photographer", name: "Mayssam Hergli", initials: "MH" },
-  { role: "Head of Writing", name: "Iyed Ben Slimene", initials: "IBS" },
-  { role: "RH", name: "Abdelkader Ben Hachena", initials: "ABH" },
-  { role: "Treasurer", name: "Karem Amara", initials: "KA" },
+  { role: "President", name: "Rima Ben Chaouacha", initials: "RBC", photo: "/team/rima-ben-chaoucha.jpg" },
+  { role: "Vice President", name: "Ranim Benzaied", initials: "RB", photo: "/team/ranim-ben-zaied.jpg" },
+  { role: "Media Manager", name: "Mariem Maatoug", initials: "MM", photo: "/team/mariem-maatoug.jpg" },
+  { role: "Media Manager", name: "Koussay Djebbi", initials: "KD", photo: "/team/koussay-djebbi.jpg" },
+  { role: "Chief Photographer", name: "Mayssam Hergli", initials: "MH", photo: "/team/mayssam-hergli.jpg" },
+  { role: "Head of Writing", name: "Iyed BenSlimen", initials: "IBS", photo: "/team/iyed-benslimen.jpg" },
+  { role: "RH", name: "Abdelkader Hachena", initials: "ABH", photo: "/team/abdelkader-ben-hachena.jpg" },
+  { role: "Treasurer", name: "Karem Amara", initials: "KA", photo: "/team/karem-amara.jpg" },
+  { role: "General Secretary", name: "Mohammed Graja", initials: "MG", photo: "/team/mohammed-graja.jpg" },
 ];
 
 const webmasters = [
- 
-  { name: "Mayssam Hergli", initials: "MH" },
-   { name: "Israa Soudani", initials: "IS" },
+  { name: "Mayssam Hergli", initials: "MH", photo: "/webmasters/mayssam-hergli.jpeg" },
+  { name: "Israa Soudani", initials: "IS", photo: "/webmasters/israa-soudani.jpeg" },
 ];
 
 export default function AboutPage() {
@@ -85,10 +86,19 @@ export default function AboutPage() {
                   key={`${member.role}-${member.name}`}
                   className="rounded-xl border border-[var(--line)] bg-[rgba(255,248,243,0.24)] p-5 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[rgba(33,25,22,0.06)]"
                 >
-                  <div className="mb-4 flex h-28 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--sand)]">
-                    <span className="font-hand text-4xl font-bold text-[rgba(130,27,22,0.38)]">
-                      {member.initials}
-                    </span>
+                  <div className="relative mb-4 h-52 overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--sand)]">
+                    {member.photo ? (
+                      <Image
+                        src={member.photo}
+                        alt={member.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span className="absolute inset-0 flex items-center justify-center font-hand text-4xl font-bold text-[rgba(130,27,22,0.38)]">
+                        {member.initials}
+                      </span>
+                    )}
                   </div>
 
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--press-red)]">
@@ -136,10 +146,19 @@ export default function AboutPage() {
                   key={webmaster.name}
                   className="rounded-xl border border-[var(--line)] bg-[rgba(255,248,243,0.24)] p-5"
                 >
-                  <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--sand)]">
-                    <span className="font-hand text-4xl font-bold text-[rgba(130,27,22,0.38)]">
-                      {webmaster.initials}
-                    </span>
+                  <div className="relative mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border border-[var(--line)] bg-[var(--sand)]">
+                    {webmaster.photo ? (
+                      <Image
+                        src={webmaster.photo}
+                        alt={webmaster.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span className="absolute inset-0 flex items-center justify-center font-hand text-4xl font-bold text-[rgba(130,27,22,0.38)]">
+                        {webmaster.initials}
+                      </span>
+                    )}
                   </div>
 
                   <h3 className="text-xl font-black text-[var(--ink)]">

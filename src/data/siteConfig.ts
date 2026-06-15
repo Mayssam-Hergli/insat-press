@@ -15,6 +15,8 @@ export const siteConfig = {
     { label: "Facebook", href: "#" },
     { label: "Instagram", href: "#" },
     { label: "LinkedIn", href: "#" },
+    { label: "YouTube", href: "#" },
+    { label: "Spotify", href: "#" },
   ],
 
   recruitment: {

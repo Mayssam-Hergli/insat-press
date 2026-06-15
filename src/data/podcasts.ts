@@ -6,8 +6,11 @@ export type PodcastEpisode = {
   date: string;
   description: string;
   coverLabel: string;
+  coverImage?: string;
   youtubeUrl: string;
   spotifyUrl: string;
+  // show notes shown on the detail page
+  content: string[];
 };
 
 export const podcasts: PodcastEpisode[] = [
@@ -22,6 +25,11 @@ export const podcasts: PodcastEpisode[] = [
     coverLabel: "talk",
     youtubeUrl: "#",
     spotifyUrl: "#",
+    content: [
+      "In this episode, we sit down with members of INSAT Press to talk about the club's creative process, day-to-day work, and what makes each department unique.",
+      "Topics include how the writing team approaches articles, how the media team plans coverage, and what it's like to be part of a student press club.",
+      "Full episode available on YouTube and Spotify.",
+    ],
   },
   {
     slug: "campus-voices",
@@ -34,6 +42,11 @@ export const podcasts: PodcastEpisode[] = [
     coverLabel: "voice",
     youtubeUrl: "#",
     spotifyUrl: "#",
+    content: [
+      "Campus Voices captures unscripted conversations with INSAT students about campus life, academic experiences, and student perspectives.",
+      "Each episode features a different mix of guests, keeping the format fresh and the conversations genuine.",
+      "Listen on YouTube or Spotify.",
+    ],
   },
   {
     slug: "creative-process",
@@ -46,5 +59,10 @@ export const podcasts: PodcastEpisode[] = [
     coverLabel: "audio",
     youtubeUrl: "#",
     spotifyUrl: "#",
+    content: [
+      "This episode dives into how raw ideas become finished pieces of content — from the first draft of an article to the final edit of a photo album.",
+      "Members from the writing, design, and photography departments share their workflows and creative philosophy.",
+      "Available on YouTube and Spotify.",
+    ],
   },
 ];
