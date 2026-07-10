@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth/session";
 import Link from "next/link";
 import LogoutButton from "@/components/admin/LogoutButton";
+import AdminNav from "@/components/admin/AdminNav";
 
 export default async function AdminLayout({
   children,
@@ -10,58 +11,37 @@ export default async function AdminLayout({
   const profile = await requireAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen page-bg">
       {/* Admin Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[rgba(239,226,217,0.9)] backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-8">
-              <Link href="/admin" className="text-xl font-bold text-gray-900">
-                Admin Panel
+            <div className="flex items-center gap-8">
+              <Link
+                href="/admin"
+                className="flex items-baseline gap-2 text-2xl font-black tracking-tight text-[var(--ink)]"
+              >
+                <span>
+                  insat <span className="text-[var(--press-red)]">press</span>
+                </span>
+                <span className="font-hand text-lg text-[var(--press-red)]">
+                  admin
+                </span>
               </Link>
-              <nav className="hidden md:flex space-x-4">
-                <Link
-                  href="/admin/articles"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Articles
-                </Link>
-                <Link
-                  href="/admin/events"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Events
-                </Link>
-                <Link
-                  href="/admin/media"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Media
-                </Link>
-                <Link
-                  href="/admin/podcast"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Podcast
-                </Link>
-                <Link
-                  href="/admin/writers"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Writers
-                </Link>
-              </nav>
+              <AdminNav />
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-700">
-                <span className="font-medium">{profile.fullName || profile.email}</span>
-                <span className="ml-2 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+            <div className="flex items-center gap-4">
+              <div className="hidden text-sm text-[var(--muted)] sm:block">
+                <span className="font-bold text-[var(--ink)]">
+                  {profile.fullName || profile.email}
+                </span>
+                <span className="ml-2 inline-flex rounded-full border border-[var(--press-red)] bg-[rgba(130,27,22,0.08)] px-2 py-0.5 text-xs font-black uppercase text-[var(--press-red)]">
                   {profile.role}
                 </span>
               </div>
               <Link
                 href="/"
-                className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+                className="text-sm font-bold text-[var(--muted)] transition-colors hover:text-[var(--press-red)]"
               >
                 View Site
               </Link>

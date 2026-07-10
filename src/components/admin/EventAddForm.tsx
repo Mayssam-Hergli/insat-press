@@ -54,9 +54,9 @@ export default function EventAddForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow-sm rounded-lg p-6">
+    <form onSubmit={handleSubmit} className="space-y-6 paper-card rounded-[1.2rem] p-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="rounded-xl border border-[var(--press-red)] bg-[rgba(130,27,22,0.08)] text-[var(--press-red)] px-4 py-3">
           {error}
         </div>
       )}
@@ -64,7 +64,7 @@ export default function EventAddForm() {
       <div className="grid grid-cols-1 gap-6">
         {/* Title */}
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="title" className="admin-label">
             Title *
           </label>
           <input
@@ -73,13 +73,13 @@ export default function EventAddForm() {
             required
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="admin-input"
           />
         </div>
 
         {/* Slug */}
         <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="slug" className="admin-label">
             Slug *
           </label>
           <input
@@ -88,9 +88,9 @@ export default function EventAddForm() {
             required
             value={formData.slug}
             onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="admin-input"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="mt-1 text-xs text-[var(--muted)]">
             URL-friendly version of the title (e.g., my-event-title)
           </p>
         </div>
@@ -98,7 +98,7 @@ export default function EventAddForm() {
         {/* Type and Status */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="type" className="admin-label">
               Type *
             </label>
             <input
@@ -107,19 +107,19 @@ export default function EventAddForm() {
               required
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-input"
             />
           </div>
 
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="status" className="admin-label">
               Status *
             </label>
             <select
               id="status"
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-input"
             >
               <option value="DRAFT">Draft</option>
               <option value="PUBLISHED">Published</option>
@@ -131,7 +131,7 @@ export default function EventAddForm() {
         {/* Edition and Location */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="edition" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edition" className="admin-label">
               Edition
             </label>
             <input
@@ -139,12 +139,12 @@ export default function EventAddForm() {
               id="edition"
               value={formData.edition}
               onChange={(e) => setFormData({ ...formData, edition: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-input"
             />
           </div>
 
           <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="location" className="admin-label">
               Location
             </label>
             <input
@@ -152,14 +152,14 @@ export default function EventAddForm() {
               id="location"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-input"
             />
           </div>
         </div>
 
         {/* Description */}
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="description" className="admin-label">
             Description *
           </label>
           <textarea
@@ -168,14 +168,14 @@ export default function EventAddForm() {
             rows={3}
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="admin-input"
           />
         </div>
 
         {/* Cover Image and Label */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="coverImage" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="coverImage" className="admin-label">
               Cover Image URL
             </label>
             <input
@@ -183,12 +183,12 @@ export default function EventAddForm() {
               id="coverImage"
               value={formData.coverImage}
               onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-input"
             />
           </div>
 
           <div>
-            <label htmlFor="coverLabel" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="coverLabel" className="admin-label">
               Cover Label
             </label>
             <input
@@ -196,7 +196,7 @@ export default function EventAddForm() {
               id="coverLabel"
               value={formData.coverLabel}
               onChange={(e) => setFormData({ ...formData, coverLabel: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-input"
             />
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function EventAddForm() {
         {/* Starts At and Display Date */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="startsAt" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="startsAt" className="admin-label">
               Starts At
             </label>
             <input
@@ -212,12 +212,12 @@ export default function EventAddForm() {
               id="startsAt"
               value={formData.startsAt}
               onChange={(e) => setFormData({ ...formData, startsAt: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-input"
             />
           </div>
 
           <div>
-            <label htmlFor="displayDate" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="displayDate" className="admin-label">
               Display Date
             </label>
             <input
@@ -226,14 +226,14 @@ export default function EventAddForm() {
               placeholder="e.g., January 2024"
               value={formData.displayDate}
               onChange={(e) => setFormData({ ...formData, displayDate: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="admin-input"
             />
           </div>
         </div>
 
         {/* Content */}
         <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="content" className="admin-label">
             Content
           </label>
           <MarkdownEditor
@@ -242,18 +242,18 @@ export default function EventAddForm() {
             onChange={(content) => setFormData({ ...formData, content })}
             placeholder="Write the event details in Markdown…"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="mt-1 text-xs text-[var(--muted)]">
             Supports Markdown: headings, <strong>**bold**</strong>, links, lists, quotes, and tables.
           </p>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+      <div className="flex justify-between items-center pt-6 border-t border-[var(--line)]">
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          className="rounded-full border border-[var(--line)] px-4 py-2 text-sm font-bold text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
         >
           Cancel
         </button>
@@ -262,7 +262,7 @@ export default function EventAddForm() {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-editorial btn-editorial-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Saving..." : "Save Changes"}
           </button>

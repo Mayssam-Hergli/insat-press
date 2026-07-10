@@ -103,25 +103,25 @@ export default function MarkdownEditor({
   }
 
   return (
-    <div className="rounded-md border border-gray-300 overflow-hidden">
+    <div className="overflow-hidden rounded-[0.6rem] border border-[var(--line)]">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 border-b border-gray-200 bg-gray-50 px-2 py-1.5">
+      <div className="flex flex-wrap items-center gap-1 border-b border-[var(--line)] bg-[rgba(216,201,192,0.35)] px-2 py-1.5">
         {TOOLBAR.map((action) => (
           <button
             key={action.title}
             type="button"
             title={action.title}
             onClick={() => applyAction(action)}
-            className="rounded px-2 py-1 text-sm font-medium text-gray-700 hover:bg-gray-200"
+            className="rounded px-2 py-1 text-sm font-bold text-[var(--ink)] hover:bg-[rgba(130,27,22,0.1)]"
           >
             {action.label}
           </button>
         ))}
-        <span className="ml-auto text-xs text-gray-400">Markdown</span>
+        <span className="ml-auto text-xs text-[var(--muted)]">Markdown</span>
       </div>
 
       {/* Split editor / preview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+      <div className="grid grid-cols-1 divide-y divide-[var(--line)] md:grid-cols-2 md:divide-x md:divide-y-0">
         <textarea
           ref={textareaRef}
           id={id}
@@ -130,11 +130,11 @@ export default function MarkdownEditor({
           placeholder={placeholder}
           spellCheck
           style={{ minHeight }}
-          className="w-full resize-y bg-white px-3 py-3 font-mono text-sm leading-6 text-gray-800 focus:outline-none"
+          className="w-full resize-y bg-[rgba(255,248,243,0.7)] px-3 py-3 font-mono text-sm leading-6 text-[var(--ink)] focus:outline-none"
         />
         <div
           style={{ minHeight }}
-          className="markdown-preview overflow-auto bg-gray-50/50 px-4 py-3 text-sm"
+          className="markdown-preview overflow-auto bg-[rgba(239,226,217,0.5)] px-4 py-3 text-sm"
         >
           {text.trim() ? (
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>

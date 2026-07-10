@@ -1,6 +1,7 @@
 import { ContentStatus } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/db/prisma";
 import { getAllWarnings } from "@/lib/admin/warnings";
+import StatusBadge from "@/components/admin/StatusBadge";
 import Link from "next/link";
 
 async function getDashboardStats() {
@@ -76,30 +77,21 @@ function StatCard({
   title,
   value,
   href,
-  color = "blue",
 }: {
   title: string;
   value: number;
   href?: string;
-  color?: "blue" | "green" | "yellow" | "gray" | "purple" | "pink";
 }) {
-  const colorClasses = {
-    blue: "bg-blue-50 text-blue-700 border-blue-200",
-    green: "bg-green-50 text-green-700 border-green-200",
-    yellow: "bg-yellow-50 text-yellow-700 border-yellow-200",
-    gray: "bg-gray-50 text-gray-700 border-gray-200",
-    purple: "bg-purple-50 text-purple-700 border-purple-200",
-    pink: "bg-pink-50 text-pink-700 border-pink-200",
-  };
-
   const content = (
     <div
-      className={`p-6 rounded-lg border-2 ${colorClasses[color]} ${href ? "hover:shadow-md transition-shadow cursor-pointer" : ""}`}
+      className={`paper-card rounded-[1.2rem] p-6 ${href ? "transition hover:-translate-y-1 hover:shadow-xl" : ""}`}
     >
-      <div className="text-sm font-medium uppercase tracking-wider mb-2">
+      <div className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-[var(--press-red)]">
         {title}
       </div>
-      <div className="text-4xl font-bold">{value}</div>
+      <div className="font-serif-display text-4xl font-bold text-[var(--ink)]">
+        {value}
+      </div>
     </div>
   );
 
@@ -116,57 +108,54 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">
+        <h1 className="mb-2 font-serif-display text-3xl font-bold text-[var(--ink)]">
+          Dashboard
+        </h1>
+        <p className="text-[var(--muted)]">
           Welcome to the INSAT Press admin panel. Here's an overview of your content.
         </p>
       </div>
 
       {/* Statistics Grid */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Content Statistics</h2>
+        <h2 className="mb-4 font-serif-display text-xl font-bold text-[var(--ink)]">
+          Content Statistics
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Draft Articles"
             value={stats.articles.draft}
             href="/admin/articles"
-            color="yellow"
           />
           <StatCard
             title="Published Articles"
             value={stats.articles.published}
             href="/admin/articles"
-            color="green"
           />
           <StatCard
             title="Archived Articles"
             value={stats.articles.archived}
             href="/admin/articles"
-            color="gray"
           />
           <StatCard
             title="Published Events"
             value={stats.publishedEvents}
             href="/admin/events"
-            color="purple"
           />
           <StatCard
             title="Media Coverage"
             value={stats.mediaCoverageCount}
             href="/admin/media"
-            color="pink"
           />
           <StatCard
             title="Podcast Episodes"
             value={stats.podcastEpisodeCount}
             href="/admin/podcast"
-            color="blue"
           />
           <StatCard
             title="Writers"
             value={stats.writerCount}
             href="/admin/writers"
-            color="blue"
           />
         </div>
       </div>
@@ -174,13 +163,13 @@ export default async function AdminDashboard() {
       {/* Data Quality Warnings */}
       {warnings.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <h2 className="mb-4 font-serif-display text-xl font-bold text-[var(--ink)]">
             Data Quality Warnings
           </h2>
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
+          <div className="rounded-[1.2rem] border border-[var(--press-red)] bg-[rgba(130,27,22,0.06)] p-4">
             <div className="flex items-start mb-3">
               <svg
-                className="h-6 w-6 text-yellow-600 mr-2"
+                className="h-6 w-6 text-[var(--press-red)] mr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -193,10 +182,10 @@ export default async function AdminDashboard() {
                 />
               </svg>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-yellow-900 mb-1">
+                <h3 className="mb-1 font-serif-display text-lg font-bold text-[var(--ink)]">
                   {warnings.length} Issue{warnings.length !== 1 ? "s" : ""} Found
                 </h3>
-                <p className="text-sm text-yellow-800 mb-3">
+                <p className="mb-3 text-sm text-[var(--muted)]">
                   Please review and fix these data quality issues before deployment.
                 </p>
               </div>
@@ -205,27 +194,27 @@ export default async function AdminDashboard() {
               {warnings.slice(0, 10).map((warning) => (
                 <div
                   key={`${warning.type}-${warning.id}`}
-                  className="bg-white rounded border border-yellow-300 p-3 flex justify-between items-center"
+                  className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-[rgba(255,248,243,0.5)] p-3"
                 >
                   <div>
-                    <span className="text-xs font-medium text-gray-500 uppercase mr-2">
+                    <span className="mr-2 text-xs font-black uppercase text-[var(--press-red)]">
                       {warning.type}
                     </span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-bold text-[var(--ink)]">
                       {warning.title}
                     </span>
-                    <p className="text-sm text-gray-600 mt-1">{warning.issue}</p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">{warning.issue}</p>
                   </div>
                   <Link
                     href={warning.editUrl}
-                    className="text-sm font-medium text-blue-600 hover:text-blue-800 whitespace-nowrap"
+                    className="whitespace-nowrap text-sm font-bold text-[var(--press-red)] hover:underline"
                   >
                     Fix →
                   </Link>
                 </div>
               ))}
               {warnings.length > 10 && (
-                <p className="text-sm text-yellow-800 text-center mt-2">
+                <p className="mt-2 text-center text-sm text-[var(--muted)]">
                   ... and {warnings.length - 10} more issue{warnings.length - 10 !== 1 ? "s" : ""}
                 </p>
               )}
@@ -236,11 +225,13 @@ export default async function AdminDashboard() {
 
       {/* Recent Activity */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
+        <h2 className="mb-4 font-serif-display text-xl font-bold text-[var(--ink)]">
+          Recent Activity
+        </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Articles */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+          <div className="paper-card rounded-[1.2rem] p-5">
+            <h3 className="mb-3 font-serif-display text-lg font-bold text-[var(--ink)]">
               Recent Articles
             </h3>
             <div className="space-y-3">
@@ -248,27 +239,19 @@ export default async function AdminDashboard() {
                 <Link
                   key={article.id.toString()}
                   href={`/admin/articles/${article.id}/edit`}
-                  className="block p-3 rounded hover:bg-gray-50 transition-colors"
+                  className="block rounded-xl p-3 transition-colors hover:bg-[rgba(255,248,243,0.55)]"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="truncate text-sm font-bold text-[var(--ink)]">
                         {article.title}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="mt-1 text-xs text-[var(--muted)]">
                         Updated {new Date(article.updatedAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <span
-                      className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${
-                        article.status === "PUBLISHED"
-                          ? "bg-green-100 text-green-800"
-                          : article.status === "DRAFT"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {article.status}
+                    <span className="ml-2 shrink-0">
+                      <StatusBadge status={article.status} />
                     </span>
                   </div>
                 </Link>
@@ -277,8 +260,8 @@ export default async function AdminDashboard() {
           </div>
 
           {/* Recent Events */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+          <div className="paper-card rounded-[1.2rem] p-5">
+            <h3 className="mb-3 font-serif-display text-lg font-bold text-[var(--ink)]">
               Recent Events
             </h3>
             <div className="space-y-3">
@@ -286,27 +269,19 @@ export default async function AdminDashboard() {
                 <Link
                   key={event.id.toString()}
                   href={`/admin/events/${event.id}/edit`}
-                  className="block p-3 rounded hover:bg-gray-50 transition-colors"
+                  className="block rounded-xl p-3 transition-colors hover:bg-[rgba(255,248,243,0.55)]"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="truncate text-sm font-bold text-[var(--ink)]">
                         {event.title}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="mt-1 text-xs text-[var(--muted)]">
                         Updated {new Date(event.updatedAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <span
-                      className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${
-                        event.status === "PUBLISHED"
-                          ? "bg-green-100 text-green-800"
-                          : event.status === "DRAFT"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {event.status}
+                    <span className="ml-2 shrink-0">
+                      <StatusBadge status={event.status} />
                     </span>
                   </div>
                 </Link>
@@ -315,8 +290,8 @@ export default async function AdminDashboard() {
           </div>
 
           {/* Recent Media Coverage */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+          <div className="paper-card rounded-[1.2rem] p-5">
+            <h3 className="mb-3 font-serif-display text-lg font-bold text-[var(--ink)]">
               Recent Media Coverage
             </h3>
             <div className="space-y-3">
@@ -324,27 +299,19 @@ export default async function AdminDashboard() {
                 <Link
                   key={media.id.toString()}
                   href={`/admin/media/${media.id}/edit`}
-                  className="block p-3 rounded hover:bg-gray-50 transition-colors"
+                  className="block rounded-xl p-3 transition-colors hover:bg-[rgba(255,248,243,0.55)]"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="truncate text-sm font-bold text-[var(--ink)]">
                         {media.title}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="mt-1 text-xs text-[var(--muted)]">
                         Updated {new Date(media.updatedAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <span
-                      className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${
-                        media.status === "PUBLISHED"
-                          ? "bg-green-100 text-green-800"
-                          : media.status === "DRAFT"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {media.status}
+                    <span className="ml-2 shrink-0">
+                      <StatusBadge status={media.status} />
                     </span>
                   </div>
                 </Link>
@@ -353,8 +320,8 @@ export default async function AdminDashboard() {
           </div>
 
           {/* Recent Podcast Episodes */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+          <div className="paper-card rounded-[1.2rem] p-5">
+            <h3 className="mb-3 font-serif-display text-lg font-bold text-[var(--ink)]">
               Recent Podcast Episodes
             </h3>
             <div className="space-y-3">
@@ -362,27 +329,19 @@ export default async function AdminDashboard() {
                 <Link
                   key={podcast.id.toString()}
                   href={`/admin/podcast/${podcast.id}/edit`}
-                  className="block p-3 rounded hover:bg-gray-50 transition-colors"
+                  className="block rounded-xl p-3 transition-colors hover:bg-[rgba(255,248,243,0.55)]"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="truncate text-sm font-bold text-[var(--ink)]">
                         {podcast.title}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="mt-1 text-xs text-[var(--muted)]">
                         Updated {new Date(podcast.updatedAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <span
-                      className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${
-                        podcast.status === "PUBLISHED"
-                          ? "bg-green-100 text-green-800"
-                          : podcast.status === "DRAFT"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {podcast.status}
+                    <span className="ml-2 shrink-0">
+                      <StatusBadge status={podcast.status} />
                     </span>
                   </div>
                 </Link>
