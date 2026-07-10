@@ -1,9 +1,11 @@
 import Navbar from "@/components/shared/Navbar";
 import PageTitle from "@/components/shared/PageTitle";
 import ArticleCard from "@/components/cards/ArticleCard";
-import { articles } from "@/data/articles";
+import { getPublishedArticles } from "@/lib/data/articles";
 
-export default function WritingPage() {
+export default async function WritingPage() {
+  const articles = await getPublishedArticles();
+
   return (
     <main className="min-h-screen page-bg">
       <Navbar />

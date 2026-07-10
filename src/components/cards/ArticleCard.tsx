@@ -1,10 +1,23 @@
-import type { Article } from "@/data/articles";
+import type { ArticleWithWriters } from "@/lib/data/articles";
 
 type ArticleCardProps = {
-  article: Article;
+  article: ArticleWithWriters;
 };
 
 export default function ArticleCard({ article }: ArticleCardProps) {
+  const writerNames = article.writers
+    .map((articleWriter) => articleWriter.writer.name)
+    .join(", ");
+  const displayWriter = writerNames || "INSAT Press";
+  const displayDate =
+    article.displayDate ??
+    article.publishedAt?.toLocaleDateString("en", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }) ??
+    "Coming soon";
+
   return (
     <a
       href={`/writing/${article.slug}`}
@@ -17,7 +30,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             <span className="font-bold text-[var(--press-red)]">
               {article.category}
             </span>{" "}
-            · {article.writer} · {article.date}
+            · {displayWriter} · {displayDate}
           </p>
 
           <h2 className="mt-1.5 max-w-3xl text-2xl font-black leading-tight text-[var(--ink)] transition-colors hover:text-[var(--press-red)] md:text-[1.7rem]">
@@ -35,7 +48,8 @@ export default function ArticleCard({ article }: ArticleCardProps) {
 
         <div className="hidden h-20 w-32 shrink-0 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--sand)] md:flex">
           <span className="font-hand text-3xl font-bold text-[rgba(130,27,22,0.38)]">
-            {article.coverLabel}
+            {// todo : should be img src= article.coverImage not label
+            article.coverLabel}
           </span>
         </div>
       </article>
