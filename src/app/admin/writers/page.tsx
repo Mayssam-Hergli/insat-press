@@ -1,12 +1,11 @@
 import { getAllWriters } from "@/lib/data/writers";
-import { requireAuth } from "@/lib/auth/session";
-import { canManageProfiles } from "@/lib/auth/permissions";
+import { requireRole } from "@/lib/auth/session";
 import Link from "next/link";
 
 export default async function AdminWritersPage() {
-  const profile = await requireAuth();
+  await requireRole("ADMIN");
   const writers = await getAllWriters();
-  const canManage = canManageProfiles(profile.role);
+  const canManage = true;
 
   return (
     <div>

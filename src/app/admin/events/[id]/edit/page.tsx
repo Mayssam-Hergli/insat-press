@@ -1,12 +1,14 @@
 import { getEventById } from "@/lib/data/events";
 import { notFound } from "next/navigation";
 import EventEditForm from "@/components/admin/EventEditForm";
+import { requireRole } from "@/lib/auth/session";
 
 export default async function EditEventPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireRole("ADMIN");
   const { id } = await params;
   const event = await getEventById(id);
 

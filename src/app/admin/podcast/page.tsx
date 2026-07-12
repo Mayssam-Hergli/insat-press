@@ -1,8 +1,10 @@
 import { getAllPodcastEpisodes } from "@/lib/data/podcastEpisodes";
 import StatusBadge from "@/components/admin/StatusBadge";
+import { requireRole } from "@/lib/auth/session";
 import Link from "next/link";
 
 export default async function AdminPodcastPage() {
+  await requireRole("ADMIN");
   const episodes = await getAllPodcastEpisodes();
 
   return (

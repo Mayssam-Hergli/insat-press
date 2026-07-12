@@ -1,6 +1,8 @@
 import PodcastAddForm from "@/components/admin/PodcastAddForm";
+import { requireRole } from "@/lib/auth/session";
 
-export default function AddPodcastPage() {
+export default async function AddPodcastPage() {
+  await requireRole("ADMIN");
   return (
     <div>
       <div className="mb-6">

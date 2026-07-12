@@ -4,8 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import MarkdownEditor from "./MarkdownEditor";
 import { dateTimeLocalToISO } from "@/lib/admin/datetime";
+import StatusSelect from "./StatusSelect";
 
-export default function MediaAddForm() {
+export default function MediaAddForm({
+  canPublish,
+}: {
+  canPublish: boolean;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -116,16 +121,11 @@ export default function MediaAddForm() {
             <label htmlFor="status" className="admin-label">
               Status *
             </label>
-            <select
-              id="status"
+            <StatusSelect
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="admin-input"
-            >
-              <option value="DRAFT">Draft</option>
-              <option value="PUBLISHED">Published</option>
-              <option value="ARCHIVED">Archived</option>
-            </select>
+              onChange={(status) => setFormData({ ...formData, status })}
+              canPublish={canPublish}
+            />
           </div>
         </div>
 

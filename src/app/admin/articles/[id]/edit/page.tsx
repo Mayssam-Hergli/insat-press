@@ -1,13 +1,16 @@
 import { getArticleById } from "@/lib/data/articles";
 import { getAllWriters } from "@/lib/data/writers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import ArticleEditForm from "@/components/admin/ArticleEditForm";
+import { requireAuth } from "@/lib/auth/session";
+import { canEditPost, canPublish } from "@/lib/auth/permissions";
 
 export default async function EditArticlePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const profile = await requireAuth();
   const { id } = await params;
   const [article, writers] = await Promise.all([
     getArticleById(id),
@@ -16,6 +19,11 @@ export default async function EditArticlePage({
 
   if (!article) {
     notFound();
+  }
+
+  // Writers may only edit their own articles.
+  if (!canEditPost(profile.role, "articles", article, profile.id)) {
+    redirect("/admin/articles");
   }
 
   return (
@@ -27,7 +35,11 @@ export default async function EditArticlePage({
         </p>
       </div>
 
-      <ArticleEditForm article={article} writers={writers} />
+      <ArticleEditForm
+        article={article}
+        writers={writers}
+        canPublish={canPublish(profile.role)}
+      />
     </div>
   );
 }

@@ -1,9 +1,20 @@
 import { getAllMediaCoverage } from "@/lib/data/mediaCoverage";
 import StatusBadge from "@/components/admin/StatusBadge";
+import { requireAuth } from "@/lib/auth/session";
+import { canAccessSection, isAdmin } from "@/lib/auth/permissions";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function AdminMediaPage() {
-  const mediaItems = await getAllMediaCoverage();
+  const profile = await requireAuth();
+  if (!canAccessSection(profile.role, "media")) {
+    redirect("/admin");
+  }
+
+  // Media staff only see their own coverage; admins see all.
+  const mediaItems = await getAllMediaCoverage(
+    isAdmin(profile.role) ? {} : { createdById: profile.id }
+  );
 
   return (
     <div>

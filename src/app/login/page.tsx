@@ -101,7 +101,7 @@ function LoginForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-editorial w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                className="ml-32 btn-editorial w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Signing in..." : "Sign in"}
               </button>
@@ -114,7 +114,7 @@ function LoginForm() {
                 <div className="w-full border-t border-[var(--line)]" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-[var(--cream)] text-[var(--muted)]">
+                <span className="px-2 bg-[#efe2d9] text-[var(--muted)]">
                   Protected Admin Area
                 </span>
               </div>

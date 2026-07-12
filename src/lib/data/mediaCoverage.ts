@@ -34,6 +34,7 @@ export type MediaCoverageWithGallery = Prisma.MediaCoverageGetPayload<{
 export type MediaCoverageFilters = PaginationOptions & {
   status?: ContentStatus;
   type?: string;
+  createdById?: string;
 };
 
 export function getAllMediaCoverage(
@@ -44,6 +45,7 @@ export function getAllMediaCoverage(
       where: {
         status: filters.status,
         type: filters.type,
+        createdById: filters.createdById,
       },
       include: mediaCoverageWithGalleryInclude,
       orderBy: mediaCoverageOrderBy,

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/session";
-import { canEdit } from "@/lib/auth/permissions";
-import { createArticle,getArticleByTitle } from "@/lib/data/articles";
+import { canAccessSection, resolveWriteStatus } from "@/lib/auth/permissions";
+import { createArticle, getArticleByTitle } from "@/lib/data/articles";
 
-export async function POST(
-  request: NextRequest
-) {
+export async function POST(request: NextRequest) {
   try {
-    // Check authentication and permissions
+    // Writers and admins may create articles; other roles may not.
     const profile = await requireAuth();
-    if (!canEdit(profile.role)) {
+    if (!canAccessSection(profile.role, "articles")) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
         { status: 403 }
@@ -17,28 +15,29 @@ export async function POST(
     }
     const body = await request.json();
 
-    // Verify article exists
+    // Verify article does not already exist
     const article = await getArticleByTitle(body.title);
     if (article) {
-      return NextResponse.json(
-        { error: "Article exists" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Article exists" }, { status: 409 });
     }
 
-    // Update the article
-    const newArticle = await createArticle( {
+    // Writers can only save a draft or submit for review; admins may publish.
+    const status = resolveWriteStatus(profile.role, body.status);
+
+    const newArticle = await createArticle({
       ...body,
+      status,
+      publishedAt: status === "PUBLISHED" ? new Date() : null,
+      createdById: profile.id,
       updatedById: profile.id,
     });
 
     return NextResponse.json(newArticle, { status: 200 });
   } catch (error) {
-    console.error("Update article error:", error);
+    console.error("Create article error:", error);
     return NextResponse.json(
-      { errorr: "Failed to add article" },
+      { error: "Failed to add article" },
       { status: 500 }
     );
   }
 }
-

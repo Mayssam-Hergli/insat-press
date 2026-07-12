@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/session";
-import { canEdit } from "@/lib/auth/permissions";
+import { isAdmin } from "@/lib/auth/permissions";
 import { updateEvent, getEventById } from "@/lib/data/events";
 
 export async function PATCH(
@@ -10,7 +10,7 @@ export async function PATCH(
   try {
     // Check authentication and permissions
     const profile = await requireAuth();
-    if (!canEdit(profile.role)) {
+    if (!isAdmin(profile.role)) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
         { status: 403 }
@@ -49,7 +49,7 @@ export async function DELETE(
   try {
     // Check authentication and permissions
     const profile = await requireAuth();
-    if (!canEdit(profile.role)) {
+    if (!isAdmin(profile.role)) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
         { status: 403 }

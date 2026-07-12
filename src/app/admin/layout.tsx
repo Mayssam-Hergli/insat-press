@@ -28,7 +28,7 @@ export default async function AdminLayout({
                   admin
                 </span>
               </Link>
-              <AdminNav />
+              <AdminNav role={profile.role} />
             </div>
             <div className="flex items-center gap-4">
               <div className="hidden text-sm text-[var(--muted)] sm:block">

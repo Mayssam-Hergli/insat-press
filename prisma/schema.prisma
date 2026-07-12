@@ -11,6 +11,7 @@ datasource db {
 
 enum ContentStatus {
   DRAFT     @map("draft")
+  PENDING   @map("pending")
   PUBLISHED @map("published")
   ARCHIVED  @map("archived")
 
@@ -19,7 +20,8 @@ enum ContentStatus {
 
 enum AdminRole {
   ADMIN  @map("admin")
-  EDITOR @map("editor")
+  WRITER @map("writer")
+  MEDIA  @map("media")
 
   @@map("admin_role")
 }
@@ -28,7 +30,7 @@ model Profile {
   id        String    @id @db.Uuid
   email     String    @unique
   fullName  String?   @map("full_name")
-  role      AdminRole @default(EDITOR)
+  role      AdminRole @default(WRITER)
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -145,6 +147,7 @@ model PodcastEpisode {
   coverImage  String?       @map("cover_image")
   coverLabel  String?       @map("cover_label")
   youtubeUrl  String        @map("youtube_url")
+  spotifyUrl String         @map("spotify_url")
   displayDate String?       @map("display_date")
   releasedAt  DateTime?     @map("released_at") @db.Timestamptz(6)
   status      ContentStatus @default(DRAFT)

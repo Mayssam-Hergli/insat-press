@@ -1,8 +1,10 @@
 import { getAllEvents } from "@/lib/data/events";
 import StatusBadge from "@/components/admin/StatusBadge";
+import { requireRole } from "@/lib/auth/session";
 import Link from "next/link";
 
 export default async function AdminEventsPage() {
+  await requireRole("ADMIN");
   const events = await getAllEvents();
 
   return (

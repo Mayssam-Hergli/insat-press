@@ -17,6 +17,7 @@ export default function PodcastAddForm() {
     guest: "",
     editedBy: "",
     youtubeUrl: "",
+    spotifyUrl: "",
     description: "",
     coverImage: "",
     coverLabel: "",
@@ -160,19 +161,35 @@ export default function PodcastAddForm() {
           </div>
         </div>
 
-        {/* YouTube URL */}
-        <div>
-          <label htmlFor="youtubeUrl" className="admin-label">
-            YouTube URL *
-          </label>
-          <input
-            type="url"
-            id="youtubeUrl"
-            required
-            value={formData.youtubeUrl}
-            onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
-            className="admin-input"
-          />
+        {/* YouTube and Spotify URLs */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="youtubeUrl" className="admin-label">
+              YouTube URL *
+            </label>
+            <input
+              type="url"
+              id="youtubeUrl"
+              required
+              value={formData.youtubeUrl}
+              onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+              className="admin-input"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="spotifyUrl" className="admin-label">
+              Spotify URL *
+            </label>
+            <input
+              type="url"
+              id="spotifyUrl"
+              required
+              value={formData.spotifyUrl}
+              onChange={(e) => setFormData({ ...formData, spotifyUrl: e.target.value })}
+              className="admin-input"
+            />
+          </div>
         </div>
 
         {/* Description */}

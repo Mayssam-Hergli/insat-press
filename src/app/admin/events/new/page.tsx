@@ -1,6 +1,8 @@
 import EventAddForm from "@/components/admin/EventAddForm";
+import { requireRole } from "@/lib/auth/session";
 
-export default function AddEventPage() {
+export default async function AddEventPage() {
+  await requireRole("ADMIN");
   return (
     <div>
       <div className="mb-6">

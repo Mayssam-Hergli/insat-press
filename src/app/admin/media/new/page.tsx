@@ -1,6 +1,14 @@
 import MediaAddForm from "@/components/admin/MediaAddForm";
+import { requireAuth } from "@/lib/auth/session";
+import { canAccessSection, canPublish } from "@/lib/auth/permissions";
+import { redirect } from "next/navigation";
 
-export default function AddMediaPage() {
+export default async function AddMediaPage() {
+  const profile = await requireAuth();
+  if (!canAccessSection(profile.role, "media")) {
+    redirect("/admin");
+  }
+
   return (
     <div>
       <div className="mb-6">
@@ -10,7 +18,7 @@ export default function AddMediaPage() {
         </p>
       </div>
 
-      <MediaAddForm />
+      <MediaAddForm canPublish={canPublish(profile.role)} />
     </div>
   );
 }

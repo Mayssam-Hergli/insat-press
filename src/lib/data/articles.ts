@@ -36,6 +36,7 @@ export type ArticleWithWriters = Prisma.ArticleGetPayload<{
 export type ArticleFilters = PaginationOptions & {
   category?: string;
   status?: ContentStatus;
+  createdById?: string;
 };
 
 export function getAllArticles(
@@ -46,6 +47,7 @@ export function getAllArticles(
       where: {
         category: filters.category,
         status: filters.status,
+        createdById: filters.createdById,
       },
       include: articleWithWritersInclude,
       orderBy: articleOrderBy,

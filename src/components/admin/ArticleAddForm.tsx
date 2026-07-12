@@ -4,13 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Writer } from "@/generated/prisma/client";
 import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
+import StatusSelect from "./StatusSelect";
 
 type ArticleAddFormProps = {
   writers: Writer[];
+  canPublish: boolean;
 };
 
-export default function ArticleAddForm ({ 
+export default function ArticleAddForm ({
   writers,
+  canPublish,
 }: ArticleAddFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -25,7 +28,7 @@ export default function ArticleAddForm ({
     coverLabel: "",
     sourceUrl:  "",
     displayDate:  "",
-    status: "Draft",
+    status: "DRAFT",
     content: toMarkdownString(""),
   });
 
@@ -116,16 +119,11 @@ export default function ArticleAddForm ({
             <label htmlFor="status" className="admin-label">
               Status *
             </label>
-            <select
-              id="status"
+            <StatusSelect
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="admin-input"
-            >
-              <option value="DRAFT">Draft</option>
-              <option value="PUBLISHED">Published</option>
-              <option value="ARCHIVED">Archived</option>
-            </select>
+              onChange={(status) => setFormData({ ...formData, status })}
+              canPublish={canPublish}
+            />
           </div>
         </div>
 

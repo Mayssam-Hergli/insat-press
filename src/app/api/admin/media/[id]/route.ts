@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/session";
-import { canEdit } from "@/lib/auth/permissions";
+import {
+  canDelete,
+  canEditPost,
+  resolveWriteStatus,
+} from "@/lib/auth/permissions";
 import {
   updateMediaCoverage,
   getMediaCoverageById,
@@ -11,17 +15,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication and permissions
     const profile = await requireAuth();
-    if (!canEdit(profile.role)) {
-      return NextResponse.json(
-        { error: "Insufficient permissions" },
-        { status: 403 }
-      );
-    }
-
     const { id } = await params;
-    const body = await request.json();
 
     // Verify media coverage exists
     const media = await getMediaCoverageById(id);
@@ -32,9 +27,29 @@ export async function PATCH(
       );
     }
 
-    // Update the media coverage
+    // Admins may edit any media coverage; media staff only their own.
+    if (!canEditPost(profile.role, "media", media, profile.id)) {
+      return NextResponse.json(
+        { error: "Insufficient permissions" },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+
+    // Media staff can only save a draft or submit for review; editing a
+    // published post sends it back to pending until an admin re-approves.
+    const status = resolveWriteStatus(profile.role, body.status);
+
+    const publishedAt =
+      status === "PUBLISHED" && !media.publishedAt
+        ? new Date()
+        : media.publishedAt;
+
     const updatedMedia = await updateMediaCoverage(id, {
       ...body,
+      status,
+      publishedAt,
       updatedById: profile.id,
     });
 
@@ -53,9 +68,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication and permissions
+    // Only admins can delete content.
     const profile = await requireAuth();
-    if (!canEdit(profile.role)) {
+    if (!canDelete(profile.role)) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
         { status: 403 }

@@ -1,8 +1,21 @@
-import { ContentStatus } from "@/generated/prisma/client";
+import { ContentStatus, type Profile } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/db/prisma";
 import { getAllWarnings } from "@/lib/admin/warnings";
+import { getAllArticles } from "@/lib/data/articles";
+import { getAllMediaCoverage } from "@/lib/data/mediaCoverage";
+import { requireAuth } from "@/lib/auth/session";
+import { isAdmin, sectionsForRole } from "@/lib/auth/permissions";
 import StatusBadge from "@/components/admin/StatusBadge";
+import ApprovalActions from "@/components/admin/ApprovalActions";
 import Link from "next/link";
+
+async function getPendingApprovals() {
+  const [articles, media] = await Promise.all([
+    getAllArticles({ status: ContentStatus.PENDING }),
+    getAllMediaCoverage({ status: ContentStatus.PENDING }),
+  ]);
+  return { articles, media };
+}
 
 async function getDashboardStats() {
   const prisma = getPrisma();
@@ -99,10 +112,18 @@ function StatCard({
 }
 
 export default async function AdminDashboard() {
-  const [stats, recentActivity, warnings] = await Promise.all([
+  const profile = await requireAuth();
+
+  // Writers and media staff get a focused view of their own submissions.
+  if (!isAdmin(profile.role)) {
+    return <ContributorDashboard profile={profile} />;
+  }
+
+  const [stats, recentActivity, warnings, pending] = await Promise.all([
     getDashboardStats(),
     getRecentActivity(),
     getAllWarnings(),
+    getPendingApprovals(),
   ]);
 
   return (
@@ -112,9 +133,11 @@ export default async function AdminDashboard() {
           Dashboard
         </h1>
         <p className="text-[var(--muted)]">
-          Welcome to the INSAT Press admin panel. Here's an overview of your content.
+          Welcome to the INSAT Press admin panel. Here&apos;s an overview of your content.
         </p>
       </div>
+
+      <PendingApprovalQueue articles={pending.articles} media={pending.media} />
 
       {/* Statistics Grid */}
       <div>
@@ -191,9 +214,9 @@ export default async function AdminDashboard() {
               </div>
             </div>
             <div className="space-y-2">
-              {warnings.slice(0, 10).map((warning) => (
+              {warnings.slice(0, 10).map((warning, index) => (
                 <div
-                  key={`${warning.type}-${warning.id}`}
+                  key={`${warning.type}-${warning.id}-${index}`}
                   className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-[rgba(255,248,243,0.5)] p-3"
                 >
                   <div>
@@ -349,6 +372,137 @@ export default async function AdminDashboard() {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+type QueueItem = { id: bigint; title: string };
+
+function PendingApprovalQueue({
+  articles,
+  media,
+}: {
+  articles: QueueItem[];
+  media: QueueItem[];
+}) {
+  const total = articles.length + media.length;
+  if (total === 0) return null;
+
+  return (
+    <div>
+      <h2 className="mb-4 font-serif-display text-xl font-bold text-[var(--ink)]">
+        Pending Approval{" "}
+        <span className="text-[var(--press-red)]">({total})</span>
+      </h2>
+      <div className="paper-card divide-y divide-[var(--line)] overflow-hidden rounded-[1.2rem]">
+        {articles.map((item) => (
+          <PendingRow
+            key={`article-${item.id}`}
+            kind="Article"
+            title={item.title}
+            section="articles"
+            id={item.id.toString()}
+          />
+        ))}
+        {media.map((item) => (
+          <PendingRow
+            key={`media-${item.id}`}
+            kind="Media"
+            title={item.title}
+            section="media"
+            id={item.id.toString()}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PendingRow({
+  kind,
+  title,
+  section,
+  id,
+}: {
+  kind: string;
+  title: string;
+  section: "articles" | "media";
+  id: string;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 p-4">
+      <div className="min-w-0">
+        <span className="mr-2 text-xs font-black uppercase text-[var(--press-red)]">
+          {kind}
+        </span>
+        <Link
+          href={`/admin/${section}/${id}/edit`}
+          className="text-sm font-bold text-[var(--ink)] hover:underline"
+        >
+          {title}
+        </Link>
+      </div>
+      <ApprovalActions section={section} id={id} />
+    </div>
+  );
+}
+
+async function ContributorDashboard({ profile }: { profile: Profile }) {
+  const [section] = sectionsForRole(profile.role);
+  const isArticles = section === "articles";
+  const sectionLabel = isArticles ? "Articles" : "Media Coverage";
+
+  const items: { id: bigint; title: string; status: ContentStatus }[] =
+    isArticles
+      ? await getAllArticles({ createdById: profile.id })
+      : await getAllMediaCoverage({ createdById: profile.id });
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="mb-2 font-serif-display text-3xl font-bold text-[var(--ink)]">
+            My {sectionLabel}
+          </h1>
+          <p className="text-[var(--muted)]">
+            Create and manage your submissions. Posts go live once an admin
+            approves them.
+          </p>
+        </div>
+        <Link
+          href={`/admin/${section}/new`}
+          className="btn-editorial btn-editorial-sm"
+        >
+          New
+        </Link>
+      </div>
+
+      <div className="paper-card overflow-hidden rounded-[1.2rem]">
+        {items.length === 0 ? (
+          <p className="p-6 text-sm text-[var(--muted)]">
+            No submissions yet. Use “New” to create your first one.
+          </p>
+        ) : (
+          <ul className="divide-y divide-[var(--line)]">
+            {items.map((item) => (
+              <li
+                key={item.id.toString()}
+                className="flex items-center justify-between gap-4 p-4 transition-colors hover:bg-[rgba(255,248,243,0.55)]"
+              >
+                <Link
+                  href={`/admin/${section}/${item.id}/edit`}
+                  className="truncate text-sm font-bold text-[var(--ink)] hover:underline"
+                >
+                  {item.title}
+                </Link>
+                <span className="shrink-0">
+                  <StatusBadge status={item.status} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

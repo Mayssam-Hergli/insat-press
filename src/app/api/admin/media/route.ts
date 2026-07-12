@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/session";
-import { canEdit } from "@/lib/auth/permissions";
+import { canAccessSection, resolveWriteStatus } from "@/lib/auth/permissions";
 import {
   createMediaCoverage,
   getMediaCoverageByTitle,
@@ -8,9 +8,9 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication and permissions
+    // Media staff and admins may create media coverage; other roles may not.
     const profile = await requireAuth();
-    if (!canEdit(profile.role)) {
+    if (!canAccessSection(profile.role, "media")) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
         { status: 403 }
@@ -28,9 +28,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create the media coverage
+    // Media staff can only save a draft or submit for review; admins may publish.
+    const status = resolveWriteStatus(profile.role, body.status);
+
     const newMedia = await createMediaCoverage({
       ...body,
+      status,
+      publishedAt: status === "PUBLISHED" ? new Date() : null,
+      createdById: profile.id,
       updatedById: profile.id,
     });
 

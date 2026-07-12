@@ -1,9 +1,20 @@
 import { getAllArticles } from "@/lib/data/articles";
 import StatusBadge from "@/components/admin/StatusBadge";
+import { requireAuth } from "@/lib/auth/session";
+import { canAccessSection, isAdmin } from "@/lib/auth/permissions";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function AdminArticlesPage() {
-  const articles = await getAllArticles();
+  const profile = await requireAuth();
+  if (!canAccessSection(profile.role, "articles")) {
+    redirect("/admin");
+  }
+
+  // Writers only see their own articles; admins see all.
+  const articles = await getAllArticles(
+    isAdmin(profile.role) ? {} : { createdById: profile.id }
+  );
 
   return (
     <div>
@@ -70,12 +81,14 @@ export default async function AdminArticlesPage() {
                   >
                     Edit
                   </Link>
-                  <Link
-                    href={`/admin/articles/${article.id}/`}
-                    className="text-[var(--muted)] transition-colors hover:text-[var(--press-red)]"
-                  >
-                    Delete
-                  </Link>
+                  {isAdmin(profile.role) && (
+                    <Link
+                      href={`/admin/articles/${article.id}/`}
+                      className="text-[var(--muted)] transition-colors hover:text-[var(--press-red)]"
+                    >
+                      Delete
+                    </Link>
+                  )}
                 </td>
               </tr>
             ))}

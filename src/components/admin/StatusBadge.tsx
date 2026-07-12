@@ -5,6 +5,8 @@ function variantFor(status: string): string {
   switch (status) {
     case "PUBLISHED":
       return "bg-[var(--press-red)] text-[var(--cream)]";
+    case "PENDING":
+      return "border border-[var(--press-red)] bg-[rgba(130,27,22,0.08)] text-[var(--press-red)]";
     case "DRAFT":
       return "bg-[var(--sand)] text-[var(--ink)]";
     default:

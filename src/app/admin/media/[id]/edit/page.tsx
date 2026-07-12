@@ -1,17 +1,25 @@
 import { getMediaCoverageById } from "@/lib/data/mediaCoverage";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import MediaEditForm from "@/components/admin/MediaEditForm";
+import { requireAuth } from "@/lib/auth/session";
+import { canEditPost, canPublish } from "@/lib/auth/permissions";
 
 export default async function EditMediaPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const profile = await requireAuth();
   const { id } = await params;
   const media = await getMediaCoverageById(id);
 
   if (!media) {
     notFound();
+  }
+
+  // Media staff may only edit their own coverage.
+  if (!canEditPost(profile.role, "media", media, profile.id)) {
+    redirect("/admin/media");
   }
 
   return (
@@ -23,7 +31,7 @@ export default async function EditMediaPage({
         </p>
       </div>
 
-      <MediaEditForm media={media} />
+      <MediaEditForm media={media} canPublish={canPublish(profile.role)} />
     </div>
   );
 }

@@ -1,12 +1,14 @@
 import { getPodcastEpisodeById } from "@/lib/data/podcastEpisodes";
 import { notFound } from "next/navigation";
 import PodcastEditForm from "@/components/admin/PodcastEditForm";
+import { requireRole } from "@/lib/auth/session";
 
 export default async function EditPodcastPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireRole("ADMIN");
   const { id } = await params;
   const episode = await getPodcastEpisodeById(id);
 

@@ -1,11 +1,16 @@
 import { getAllWriters } from "@/lib/data/writers";
 import ArticleAddForm from "@/components/admin/ArticleAddForm";
+import { requireAuth } from "@/lib/auth/session";
+import { canAccessSection, canPublish } from "@/lib/auth/permissions";
+import { redirect } from "next/navigation";
 
 export default async function AddArticlePage(){
-  const  [writers] = await Promise.all([
-    getAllWriters(),
-  ]);
+  const profile = await requireAuth();
+  if (!canAccessSection(profile.role, "articles")) {
+    redirect("/admin");
+  }
 
+  const writers = await getAllWriters();
 
   return (
     <div>
@@ -16,7 +21,7 @@ export default async function AddArticlePage(){
         </p>
       </div>
 
-      <ArticleAddForm  writers={writers} />
+      <ArticleAddForm writers={writers} canPublish={canPublish(profile.role)} />
     </div>
   );
 }
