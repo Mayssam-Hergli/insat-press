@@ -46,7 +46,15 @@ export default function Footer() {
 
         <div className="mt-8 flex flex-col gap-3 border-t border-[var(--line)] pt-5 text-sm font-semibold text-[var(--muted)] md:flex-row md:items-center md:justify-between">
           <p>© 2026 INSAT Press. All rights reserved.</p>
-          <p>Made by Mayssam Hergli & Israa Soudani .</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <p>Made by Mayssam Hergli, Israa Soudani & Moetez Zouari.</p>
+            <Link
+              href="/login"
+              className="w-fit rounded-full border border-[var(--line)] px-3 py-1 text-xs font-bold text-[var(--muted)] transition-colors hover:border-[var(--press-red)] hover:text-[var(--press-red)]"
+            >
+              Admin Login
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
