@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/session";
 import { canAccessSection, resolveWriteStatus } from "@/lib/auth/permissions";
 import { createArticle, getArticleByTitle } from "@/lib/data/articles";
+import { setArticleWriters } from "@/lib/data/articleWriters";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
-    const body = await request.json();
+    const { writerIds, ...body } = await request.json();
 
     // Verify article does not already exist
     const article = await getArticleByTitle(body.title);
@@ -31,6 +32,8 @@ export async function POST(request: NextRequest) {
       createdById: profile.id,
       updatedById: profile.id,
     });
+
+    await setArticleWriters(newArticle.id, writerIds ?? []);
 
     return NextResponse.json(newArticle, { status: 200 });
   } catch (error) {

@@ -1,5 +1,5 @@
 import { getArticleById } from "@/lib/data/articles";
-import { getAllWriters } from "@/lib/data/writers";
+import { getAllProfiles } from "@/lib/data/profiles";
 import { notFound, redirect } from "next/navigation";
 import ArticleEditForm from "@/components/admin/ArticleEditForm";
 import { requireAuth } from "@/lib/auth/session";
@@ -12,9 +12,9 @@ export default async function EditArticlePage({
 }) {
   const profile = await requireAuth();
   const { id } = await params;
-  const [article, writers] = await Promise.all([
+  const [article, profiles] = await Promise.all([
     getArticleById(id),
-    getAllWriters(),
+    getAllProfiles(),
   ]);
 
   if (!article) {
@@ -37,7 +37,7 @@ export default async function EditArticlePage({
 
       <ArticleEditForm
         article={article}
-        writers={writers}
+        profiles={profiles}
         canPublish={canPublish(profile.role)}
       />
     </div>

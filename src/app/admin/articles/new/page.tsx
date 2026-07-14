@@ -1,4 +1,4 @@
-import { getAllWriters } from "@/lib/data/writers";
+import { getAllProfiles } from "@/lib/data/profiles";
 import ArticleAddForm from "@/components/admin/ArticleAddForm";
 import { requireAuth } from "@/lib/auth/session";
 import { canAccessSection, canPublish } from "@/lib/auth/permissions";
@@ -10,7 +10,7 @@ export default async function AddArticlePage(){
     redirect("/admin");
   }
 
-  const writers = await getAllWriters();
+  const profiles = await getAllProfiles();
 
   return (
     <div>
@@ -21,7 +21,7 @@ export default async function AddArticlePage(){
         </p>
       </div>
 
-      <ArticleAddForm writers={writers} canPublish={canPublish(profile.role)} />
+      <ArticleAddForm profiles={profiles} canPublish={canPublish(profile.role)} />
     </div>
   );
 }

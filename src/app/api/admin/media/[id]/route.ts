@@ -9,6 +9,7 @@ import {
   updateMediaCoverage,
   getMediaCoverageById,
 } from "@/lib/data/mediaCoverage";
+import { setMediaCoverageContributors } from "@/lib/data/mediaCoverageContributors";
 
 export async function PATCH(
   request: NextRequest,
@@ -35,7 +36,7 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    const { coveredByIds, editedByIds, ...body } = await request.json();
 
     // Media staff can only save a draft or submit for review; editing a
     // published post sends it back to pending until an admin re-approves.
@@ -52,6 +53,13 @@ export async function PATCH(
       publishedAt,
       updatedById: profile.id,
     });
+
+    if (coveredByIds !== undefined || editedByIds !== undefined) {
+      await setMediaCoverageContributors(id, {
+        coveredByIds: coveredByIds ?? [],
+        editedByIds: editedByIds ?? [],
+      });
+    }
 
     return NextResponse.json(updatedMedia, { status: 200 });
   } catch (error) {

@@ -24,9 +24,9 @@ export default function AdminNav({ role }: { role: AdminRole }) {
 
   const links = sectionsForRole(role).map((section) => SECTION_LINKS[section]);
   if (canManageProfiles(role)) {
-    links.push({ href: "/admin/writers", label: "Writers" });
     links.push({ href: "/admin/team", label: "Team" });
   }
+  links.push({ href: "/admin/profile", label: "My Profile" });
 
   return (
     <nav className="hidden items-center gap-6 text-sm font-bold md:flex">

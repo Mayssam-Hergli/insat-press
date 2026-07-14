@@ -1,12 +1,13 @@
-import type { ArticleWithWriters } from "@/lib/data/articles";
+import type { ArticleWithContributors } from "@/lib/data/articles";
 
 type ArticleCardProps = {
-  article: ArticleWithWriters;
+  article: ArticleWithContributors;
 };
 
 export default function ArticleCard({ article }: ArticleCardProps) {
   const writerNames = article.writers
-    .map((articleWriter) => articleWriter.writer.name)
+    .map((articleWriter) => articleWriter.profile.fullName)
+    .filter(Boolean)
     .join(", ");
   const displayWriter = writerNames || "INSAT Press";
   const displayDate =

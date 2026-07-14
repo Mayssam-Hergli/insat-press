@@ -2,25 +2,29 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { ArticleWithWriters } from "@/lib/data/articles";
-import type { Writer } from "@/generated/prisma/client";
+import type { ArticleWithContributors } from "@/lib/data/articles";
+import type { Profile } from "@/generated/prisma/client";
 import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
 import StatusSelect from "./StatusSelect";
+import ContributorSelect from "./ContributorSelect";
 
 type ArticleEditFormProps = {
-  article: ArticleWithWriters;
-  writers: Writer[];
+  article: ArticleWithContributors;
+  profiles: Profile[];
   canPublish: boolean;
 };
 
 export default function ArticleEditForm({
   article,
-  writers,
+  profiles,
   canPublish,
 }: ArticleEditFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [writerIds, setWriterIds] = useState<string[]>(
+    article.writers.map((w) => w.profileId)
+  );
 
   const [formData, setFormData] = useState({
     title: article.title,
@@ -44,7 +48,7 @@ export default function ArticleEditForm({
       const response = await fetch(`/api/admin/articles/${article.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, writerIds }),
       });
 
       if (!response.ok) {
@@ -205,17 +209,12 @@ export default function ArticleEditForm({
         </div>
 
         {/* Writers */}
-        <div>
-          <label className="admin-label">
-            Writers
-          </label>
-          <div className="text-sm text-[var(--muted)]">
-            Current writers: {article.writers.map((w) => w.writer.name).join(", ") || "None"}
-          </div>
-          <p className="mt-1 text-xs text-[var(--muted)]">
-            Note: Writer management will be implemented in a future update
-          </p>
-        </div>
+        <ContributorSelect
+          profiles={profiles}
+          value={writerIds}
+          onChange={setWriterIds}
+          label="Writers"
+        />
 
         {/* Content */}
         <div>

@@ -6,6 +6,7 @@ import {
   resolveWriteStatus,
 } from "@/lib/auth/permissions";
 import { updateArticle, getArticleById } from "@/lib/data/articles";
+import { setArticleWriters } from "@/lib/data/articleWriters";
 
 export async function PATCH(
   request: NextRequest,
@@ -29,7 +30,7 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    const { writerIds, ...body } = await request.json();
 
     // Writers can only save a draft or submit for review; editing a published
     // post therefore sends it back to pending until an admin re-approves.
@@ -47,6 +48,10 @@ export async function PATCH(
       publishedAt,
       updatedById: profile.id,
     });
+
+    if (writerIds !== undefined) {
+      await setArticleWriters(id, writerIds);
+    }
 
     return NextResponse.json(updatedArticle, { status: 200 });
   } catch (error) {

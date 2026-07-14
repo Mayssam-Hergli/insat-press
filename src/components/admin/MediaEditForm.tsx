@@ -2,27 +2,34 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { MediaCoverageWithGallery } from "@/lib/data/mediaCoverage";
+import type { MediaCoverageWithRelations } from "@/lib/data/mediaCoverage";
+import type { Profile } from "@/generated/prisma/client";
 import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
 import { toDateTimeLocalValue, dateTimeLocalToISO } from "@/lib/admin/datetime";
 import StatusSelect from "./StatusSelect";
+import ContributorSelect from "./ContributorSelect";
 
 type MediaEditFormProps = {
-  media: MediaCoverageWithGallery;
+  media: MediaCoverageWithRelations;
+  profiles: Profile[];
   canPublish: boolean;
 };
 
-export default function MediaEditForm({ media, canPublish }: MediaEditFormProps) {
+export default function MediaEditForm({ media, profiles, canPublish }: MediaEditFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [coveredByIds, setCoveredByIds] = useState<string[]>(
+    media.contributors.filter((c) => c.role === "COVERED_BY").map((c) => c.profileId)
+  );
+  const [editedByIds, setEditedByIds] = useState<string[]>(
+    media.contributors.filter((c) => c.role === "EDITED_BY").map((c) => c.profileId)
+  );
 
   const [formData, setFormData] = useState({
     title: media.title,
     slug: media.slug,
     type: media.type,
-    coveredBy: media.coveredBy,
-    editedBy: media.editedBy,
     eventName: media.eventName,
     description: media.description,
     coverImage: media.coverImage || "",
@@ -45,6 +52,8 @@ export default function MediaEditForm({ media, canPublish }: MediaEditFormProps)
         body: JSON.stringify({
           ...formData,
           coveredAt: dateTimeLocalToISO(formData.coveredAt),
+          coveredByIds,
+          editedByIds,
         }),
       });
 
@@ -133,33 +142,19 @@ export default function MediaEditForm({ media, canPublish }: MediaEditFormProps)
 
         {/* Covered By and Edited By */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="coveredBy" className="admin-label">
-              Covered By *
-            </label>
-            <input
-              type="text"
-              id="coveredBy"
-              required
-              value={formData.coveredBy}
-              onChange={(e) => setFormData({ ...formData, coveredBy: e.target.value })}
-              className="admin-input"
-            />
-          </div>
+          <ContributorSelect
+            profiles={profiles}
+            value={coveredByIds}
+            onChange={setCoveredByIds}
+            label="Covered By"
+          />
 
-          <div>
-            <label htmlFor="editedBy" className="admin-label">
-              Edited By *
-            </label>
-            <input
-              type="text"
-              id="editedBy"
-              required
-              value={formData.editedBy}
-              onChange={(e) => setFormData({ ...formData, editedBy: e.target.value })}
-              className="admin-input"
-            />
-          </div>
+          <ContributorSelect
+            profiles={profiles}
+            value={editedByIds}
+            onChange={setEditedByIds}
+            label="Edited By"
+          />
         </div>
 
         {/* Event Name */}

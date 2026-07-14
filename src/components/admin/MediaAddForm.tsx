@@ -2,25 +2,29 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { Profile } from "@/generated/prisma/client";
 import MarkdownEditor from "./MarkdownEditor";
 import { dateTimeLocalToISO } from "@/lib/admin/datetime";
 import StatusSelect from "./StatusSelect";
+import ContributorSelect from "./ContributorSelect";
 
 export default function MediaAddForm({
+  profiles,
   canPublish,
 }: {
+  profiles: Profile[];
   canPublish: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [coveredByIds, setCoveredByIds] = useState<string[]>([]);
+  const [editedByIds, setEditedByIds] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
     type: "",
-    coveredBy: "",
-    editedBy: "",
     eventName: "",
     description: "",
     coverImage: "",
@@ -43,6 +47,8 @@ export default function MediaAddForm({
         body: JSON.stringify({
           ...formData,
           coveredAt: dateTimeLocalToISO(formData.coveredAt),
+          coveredByIds,
+          editedByIds,
         }),
       });
 
@@ -131,33 +137,19 @@ export default function MediaAddForm({
 
         {/* Covered By and Edited By */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="coveredBy" className="admin-label">
-              Covered By *
-            </label>
-            <input
-              type="text"
-              id="coveredBy"
-              required
-              value={formData.coveredBy}
-              onChange={(e) => setFormData({ ...formData, coveredBy: e.target.value })}
-              className="admin-input"
-            />
-          </div>
+          <ContributorSelect
+            profiles={profiles}
+            value={coveredByIds}
+            onChange={setCoveredByIds}
+            label="Covered By"
+          />
 
-          <div>
-            <label htmlFor="editedBy" className="admin-label">
-              Edited By *
-            </label>
-            <input
-              type="text"
-              id="editedBy"
-              required
-              value={formData.editedBy}
-              onChange={(e) => setFormData({ ...formData, editedBy: e.target.value })}
-              className="admin-input"
-            />
-          </div>
+          <ContributorSelect
+            profiles={profiles}
+            value={editedByIds}
+            onChange={setEditedByIds}
+            label="Edited By"
+          />
         </div>
 
         {/* Event Name */}

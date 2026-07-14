@@ -2,22 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Writer } from "@/generated/prisma/client";
+import type { Profile } from "@/generated/prisma/client";
 import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
 import StatusSelect from "./StatusSelect";
+import ContributorSelect from "./ContributorSelect";
 
 type ArticleAddFormProps = {
-  writers: Writer[];
+  profiles: Profile[];
   canPublish: boolean;
 };
 
 export default function ArticleAddForm ({
-  writers,
+  profiles,
   canPublish,
 }: ArticleAddFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [writerIds, setWriterIds] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -41,7 +43,7 @@ export default function ArticleAddForm ({
       const response = await fetch(`/api/admin/articles/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, writerIds }),
       });
 
       if (!response.ok) {
@@ -202,17 +204,12 @@ export default function ArticleAddForm ({
         </div>
 
         {/* Writers */}
-        <div>
-          <label className="admin-label">
-            Writers
-          </label>
-          <div className="text-sm text-[var(--muted)]">
-            Current writers: {writers.map((w) => w.name).join(", ") || "None"}
-          </div>
-          <p className="mt-1 text-xs text-[var(--muted)]">
-            Note: Writer management will be implemented in a future update
-          </p>
-        </div>
+        <ContributorSelect
+          profiles={profiles}
+          value={writerIds}
+          onChange={setWriterIds}
+          label="Writers"
+        />
 
         {/* Content */}
         <div>
