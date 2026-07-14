@@ -152,7 +152,6 @@ model PodcastEpisode {
   updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
   createdById String?       @map("created_by_id") @db.Uuid
   updatedById String?       @map("updated_by_id") @db.Uuid
-  spotify_url String
   createdBy   Profile?      @relation("PodcastCreatedBy", fields: [createdById], references: [id])
   updatedBy   Profile?      @relation("PodcastUpdatedBy", fields: [updatedById], references: [id])
 
@@ -211,19 +210,4 @@ model MediaGalleryImage {
   @@map("media_gallery_images")
 }
 
-enum ContentStatus {
-  DRAFT     @map("draft")
-  pending
-  PUBLISHED @map("published")
-  ARCHIVED  @map("archived")
 
-  @@map("content_status")
-}
-
-enum AdminRole {
-  ADMIN  @map("admin")
-  writer
-  media
-
-  @@map("admin_role")
-}
