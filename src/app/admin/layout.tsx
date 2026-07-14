@@ -16,10 +16,10 @@ export default async function AdminLayout({
       <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[rgba(239,226,217,0.9)] backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-4 md:gap-8">
               <Link
                 href="/admin"
-                className="flex items-baseline gap-2 text-2xl font-black tracking-tight text-[var(--ink)]"
+                className="flex items-baseline gap-2 text-xl font-black tracking-tight text-[var(--ink)] sm:text-2xl"
               >
                 <span>
                   insat <span className="text-[var(--press-red)]">press</span>
@@ -30,7 +30,7 @@ export default async function AdminLayout({
               </Link>
               <AdminNav role={profile.role} />
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div className="hidden text-sm text-[var(--muted)] sm:block">
                 <span className="font-bold text-[var(--ink)]">
                   {profile.fullName || profile.email}
@@ -41,7 +41,7 @@ export default async function AdminLayout({
               </div>
               <Link
                 href="/"
-                className="text-sm font-bold text-[var(--muted)] transition-colors hover:text-[var(--press-red)]"
+                className="hidden text-sm font-bold text-[var(--muted)] transition-colors hover:text-[var(--press-red)] sm:block"
               >
                 View Site
               </Link>

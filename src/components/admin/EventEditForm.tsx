@@ -101,7 +101,7 @@ export default function EventEditForm({ event }: EventEditFormProps) {
         </div>
 
         {/* Type and Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="type" className="admin-label">
               Type *
@@ -134,7 +134,7 @@ export default function EventEditForm({ event }: EventEditFormProps) {
         </div>
 
         {/* Edition and Location */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="edition" className="admin-label">
               Edition
@@ -178,7 +178,7 @@ export default function EventEditForm({ event }: EventEditFormProps) {
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coverImage" className="admin-label">
               Cover Image URL
@@ -207,7 +207,7 @@ export default function EventEditForm({ event }: EventEditFormProps) {
         </div>
 
         {/* Starts At and Display Date */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="startsAt" className="admin-label">
               Starts At

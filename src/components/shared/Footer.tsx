@@ -48,12 +48,6 @@ export default function Footer() {
           <p>© 2026 INSAT Press. All rights reserved.</p>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <p>Made by Mayssam Hergli, Israa Soudani & Moetez Zouari.</p>
-            <Link
-              href="/login"
-              className="w-fit rounded-full border border-[var(--line)] px-3 py-1 text-xs font-bold text-[var(--muted)] transition-colors hover:border-[var(--press-red)] hover:text-[var(--press-red)]"
-            >
-              Admin Login
-            </Link>
           </div>
         </div>
       </div>

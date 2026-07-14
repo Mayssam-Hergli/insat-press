@@ -14,7 +14,7 @@ export default async function AdminTeamPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-serif-display text-3xl font-bold text-[var(--ink)]">
             Team
@@ -29,7 +29,7 @@ export default async function AdminTeamPage() {
         </Link>
       </div>
 
-      <div className="paper-card rounded-[1.2rem] overflow-hidden">
+      <div className="paper-card rounded-[1.2rem] overflow-x-auto">
         <table className="min-w-full divide-y divide-[var(--line)]">
           <thead className="bg-[rgba(216,201,192,0.35)]">
             <tr>

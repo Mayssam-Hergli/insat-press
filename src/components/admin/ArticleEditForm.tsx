@@ -107,7 +107,7 @@ export default function ArticleEditForm({
         </div>
 
         {/* Category and Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="category" className="admin-label">
               Category *
@@ -150,7 +150,7 @@ export default function ArticleEditForm({
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coverImage" className="admin-label">
               Cover Image URL
@@ -179,7 +179,7 @@ export default function ArticleEditForm({
         </div>
 
         {/* Source URL and Display Date */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="sourceUrl" className="admin-label">
               Source URL

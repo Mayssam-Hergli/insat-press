@@ -108,7 +108,7 @@ export default function MediaAddForm({
         </div>
 
         {/* Type and Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="type" className="admin-label">
               Type *
@@ -136,7 +136,7 @@ export default function MediaAddForm({
         </div>
 
         {/* Covered By and Edited By */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <ContributorSelect
             profiles={profiles}
             value={coveredByIds}
@@ -183,7 +183,7 @@ export default function MediaAddForm({
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coverImage" className="admin-label">
               Cover Image URL
@@ -212,7 +212,7 @@ export default function MediaAddForm({
         </div>
 
         {/* Covered At and Display Date */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coveredAt" className="admin-label">
               Covered At

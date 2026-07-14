@@ -103,7 +103,7 @@ export default function PodcastEditForm({ episode }: PodcastEditFormProps) {
         </div>
 
         {/* Host and Guest */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="host" className="admin-label">
               Host *
@@ -134,7 +134,7 @@ export default function PodcastEditForm({ episode }: PodcastEditFormProps) {
         </div>
 
         {/* Edited By and Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="editedBy" className="admin-label">
               Edited By *
@@ -167,7 +167,7 @@ export default function PodcastEditForm({ episode }: PodcastEditFormProps) {
         </div>
 
         {/* YouTube and Spotify URLs */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="youtubeUrl" className="admin-label">
               YouTube URL *
@@ -213,7 +213,7 @@ export default function PodcastEditForm({ episode }: PodcastEditFormProps) {
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coverImage" className="admin-label">
               Cover Image URL
@@ -242,7 +242,7 @@ export default function PodcastEditForm({ episode }: PodcastEditFormProps) {
         </div>
 
         {/* Released At and Display Date */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="releasedAt" className="admin-label">
               Released At
