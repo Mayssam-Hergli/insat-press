@@ -2,11 +2,11 @@ import type { ArticleWriter, Prisma } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/db/prisma";
 import { runDataQuery, toBigIntId, type EntityId } from "./utils";
 
-function articleWriterWhere(articleId: EntityId, writerId: EntityId) {
+function articleWriterWhere(articleId: EntityId, profileId: string) {
   return {
-    articleId_writerId: {
+    articleId_profileId: {
       articleId: toBigIntId(articleId),
-      writerId: toBigIntId(writerId),
+      profileId,
     },
   };
 }
@@ -32,14 +32,14 @@ export function createArticleWriter(
 
 export function updateArticleWriter(
   articleId: EntityId,
-  writerId: EntityId,
+  profileId: string,
   data: Prisma.ArticleWriterUpdateInput
 ): Promise<ArticleWriter> {
   return runDataQuery(
-    `update writer ${String(writerId)} for article ${String(articleId)}`,
+    `update writer profile ${profileId} for article ${String(articleId)}`,
     () =>
       getPrisma().articleWriter.update({
-        where: articleWriterWhere(articleId, writerId),
+        where: articleWriterWhere(articleId, profileId),
         data,
       })
   );
@@ -47,27 +47,27 @@ export function updateArticleWriter(
 
 export function deleteArticleWriter(
   articleId: EntityId,
-  writerId: EntityId
+  profileId: string
 ): Promise<ArticleWriter> {
   return runDataQuery(
-    `delete writer ${String(writerId)} for article ${String(articleId)}`,
+    `delete writer profile ${profileId} for article ${String(articleId)}`,
     () =>
       getPrisma().articleWriter.delete({
-        where: articleWriterWhere(articleId, writerId),
+        where: articleWriterWhere(articleId, profileId),
       })
   );
 }
 
 export function setArticleWriters(
   articleId: EntityId,
-  writerIds: EntityId[]
+  profileIds: string[]
 ): Promise<ArticleWriter[]> {
   return runDataQuery(`set writers for article ${String(articleId)}`, async () => {
     const prisma = getPrisma();
     const parsedArticleId = toBigIntId(articleId);
-    const rows = writerIds.map((writerId, index) => ({
+    const rows = profileIds.map((profileId, index) => ({
       articleId: parsedArticleId,
-      writerId: toBigIntId(writerId),
+      profileId,
       sortOrder: index,
     }));
 

@@ -3,31 +3,30 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ArticleWithWriters } from "@/lib/data/articles";
-import type { Writer } from "@/generated/prisma/client";
 import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
 import StatusSelect from "./StatusSelect";
+import ArticleCoverPicker from "./ArticleCoverPicker";
 
 type ArticleEditFormProps = {
   article: ArticleWithWriters;
-  writers: Writer[];
   canPublish: boolean;
 };
 
 export default function ArticleEditForm({
   article,
-  writers,
   canPublish,
 }: ArticleEditFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [removeCover, setRemoveCover] = useState(false);
 
   const [formData, setFormData] = useState({
     title: article.title,
     slug: article.slug,
     category: article.category,
     description: article.description,
-    coverImage: article.coverImage || "",
     coverLabel: article.coverLabel || "",
     sourceUrl: article.sourceUrl || "",
     displayDate: article.displayDate || "",
@@ -44,13 +43,29 @@ export default function ArticleEditForm({
       const response = await fetch(`/api/admin/articles/${article.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, status: undefined }),
       });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Failed to update article");
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to update article");
+      if (coverFile) {
+        const upload = new FormData();
+        upload.set("file", coverFile);
+        const coverResponse = await fetch(`/api/admin/articles/${article.id}/cover`, { method: "POST", body: upload });
+        const coverData = await coverResponse.json().catch(() => ({}));
+        if (!coverResponse.ok) throw new Error(coverData.error || "Cover upload failed; the article text was saved.");
+      } else if (removeCover) {
+        const coverResponse = await fetch(`/api/admin/articles/${article.id}/cover`, { method: "DELETE" });
+        const coverData = await coverResponse.json().catch(() => ({}));
+        if (!coverResponse.ok) throw new Error(coverData.error || "Cover removal was only partially completed.");
       }
+
+      const transition = await fetch(`/api/admin/articles/${article.id}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: formData.status }),
+      });
+      const transitionData = await transition.json().catch(() => ({}));
+      if (!transition.ok) throw new Error(transitionData.error || "Content was saved, but the status could not be updated.");
 
       router.push("/admin/articles");
       router.refresh();
@@ -146,20 +161,14 @@ export default function ArticleEditForm({
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="coverImage" className="admin-label">
-              Cover Image URL
-            </label>
-            <input
-              type="url"
-              id="coverImage"
-              value={formData.coverImage}
-              onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-              className="admin-input"
-            />
-          </div>
-
+        <div className="grid gap-4 md:grid-cols-2">
+          <ArticleCoverPicker
+            currentPath={article.coverImage}
+            file={coverFile}
+            removeCurrent={removeCover}
+            onFileChange={setCoverFile}
+            onRemoveCurrentChange={setRemoveCover}
+          />
           <div>
             <label htmlFor="coverLabel" className="admin-label">
               Cover Label
@@ -210,7 +219,9 @@ export default function ArticleEditForm({
             Writers
           </label>
           <div className="text-sm text-[var(--muted)]">
-            Current writers: {article.writers.map((w) => w.writer.name).join(", ") || "None"}
+            Current writers: {article.writers
+              .map(({ profile }) => profile.fullName ?? profile.email)
+              .join(", ") || "None"}
           </div>
           <p className="mt-1 text-xs text-[var(--muted)]">
             Note: Writer management will be implemented in a future update

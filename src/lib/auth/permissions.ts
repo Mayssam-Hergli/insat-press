@@ -57,6 +57,25 @@ export function canEditPost(
   return canAccessSection(role, section) && post.createdById === userId;
 }
 
+/** Writers may modify only their own drafts; admins retain review control. */
+export function canEditArticle(
+  role: AdminRole,
+  article: { createdById: string | null; status: ContentStatus },
+  userId: string
+): boolean {
+  if (isAdmin(role)) return true;
+  return canAccessSection(role, "articles") && article.createdById === userId && article.status === "DRAFT";
+}
+
+/** Owners may preview their drafts and locked review submissions. */
+export function canViewArticle(
+  role: AdminRole,
+  article: { createdById: string | null },
+  userId: string
+): boolean {
+  return isAdmin(role) || article.createdById === userId;
+}
+
 const VALID_STATUSES: ContentStatus[] = [
   "DRAFT",
   "PENDING",

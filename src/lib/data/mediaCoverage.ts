@@ -18,6 +18,14 @@ const mediaCoverageOrderBy = [
 ] satisfies Prisma.MediaCoverageOrderByWithRelationInput[];
 
 const mediaCoverageWithGalleryInclude = {
+  contributors: {
+    include: {
+      profile: true,
+    },
+    orderBy: {
+      sortOrder: "asc",
+    },
+  },
   gallery: {
     orderBy: {
       sortOrder: "asc",

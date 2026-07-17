@@ -19,7 +19,7 @@ const articleOrderBy = [
 const articleWithWritersInclude = {
   writers: {
     include: {
-      writer: true,
+      profile: true,
     },
     orderBy: {
       sortOrder: "asc",

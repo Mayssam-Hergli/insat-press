@@ -19,8 +19,6 @@ export default function MediaAddForm({
     title: "",
     slug: "",
     type: "",
-    coveredBy: "",
-    editedBy: "",
     eventName: "",
     description: "",
     coverImage: "",
@@ -129,35 +127,12 @@ export default function MediaAddForm({
           </div>
         </div>
 
-        {/* Covered By and Edited By */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="coveredBy" className="admin-label">
-              Covered By *
-            </label>
-            <input
-              type="text"
-              id="coveredBy"
-              required
-              value={formData.coveredBy}
-              onChange={(e) => setFormData({ ...formData, coveredBy: e.target.value })}
-              className="admin-input"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="editedBy" className="admin-label">
-              Edited By *
-            </label>
-            <input
-              type="text"
-              id="editedBy"
-              required
-              value={formData.editedBy}
-              onChange={(e) => setFormData({ ...formData, editedBy: e.target.value })}
-              className="admin-input"
-            />
-          </div>
+        <div>
+          <label className="admin-label">Contributors</label>
+          <p className="text-sm text-[var(--muted)]">
+            Coverage and editing contributors are linked to team profiles and
+            can be assigned after the media entry is created.
+          </p>
         </div>
 
         {/* Event Name */}

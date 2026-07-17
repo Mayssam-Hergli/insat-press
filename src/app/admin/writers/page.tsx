@@ -49,12 +49,12 @@ export default async function AdminWritersPage() {
                     {writer.avatarUrl && (
                       <img
                         src={writer.avatarUrl}
-                        alt={writer.name}
+                        alt={writer.fullName ?? writer.email}
                         className="mr-3 h-10 w-10 rounded-full border border-[var(--line)] object-cover"
                       />
                     )}
                     <div className="text-sm font-bold text-[var(--ink)]">
-                      {writer.name}
+                      {writer.fullName ?? writer.email}
                     </div>
                   </div>
                 </td>

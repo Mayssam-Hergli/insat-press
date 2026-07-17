@@ -16,13 +16,19 @@ export default function MediaEditForm({ media, canPublish }: MediaEditFormProps)
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const coveredBy = media.contributors
+    .filter((contributor) => contributor.role === "COVERED_BY")
+    .map(({ profile }) => profile.fullName ?? profile.email)
+    .join(", ");
+  const editedBy = media.contributors
+    .filter((contributor) => contributor.role === "EDITED_BY")
+    .map(({ profile }) => profile.fullName ?? profile.email)
+    .join(", ");
 
   const [formData, setFormData] = useState({
     title: media.title,
     slug: media.slug,
     type: media.type,
-    coveredBy: media.coveredBy,
-    editedBy: media.editedBy,
     eventName: media.eventName,
     description: media.description,
     coverImage: media.coverImage || "",
@@ -131,34 +137,16 @@ export default function MediaEditForm({ media, canPublish }: MediaEditFormProps)
           </div>
         </div>
 
-        {/* Covered By and Edited By */}
+        {/* Contributors */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="coveredBy" className="admin-label">
-              Covered By *
-            </label>
-            <input
-              type="text"
-              id="coveredBy"
-              required
-              value={formData.coveredBy}
-              onChange={(e) => setFormData({ ...formData, coveredBy: e.target.value })}
-              className="admin-input"
-            />
+            <label className="admin-label">Covered By</label>
+            <p className="text-sm text-[var(--muted)]">{coveredBy || "None"}</p>
           </div>
 
           <div>
-            <label htmlFor="editedBy" className="admin-label">
-              Edited By *
-            </label>
-            <input
-              type="text"
-              id="editedBy"
-              required
-              value={formData.editedBy}
-              onChange={(e) => setFormData({ ...formData, editedBy: e.target.value })}
-              className="admin-input"
-            />
+            <label className="admin-label">Edited By</label>
+            <p className="text-sm text-[var(--muted)]">{editedBy || "None"}</p>
           </div>
         </div>
 

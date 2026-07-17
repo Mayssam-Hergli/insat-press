@@ -35,7 +35,7 @@ async function getDashboardStats() {
     prisma.event.count({ where: { status: ContentStatus.PUBLISHED } }),
     prisma.mediaCoverage.count(),
     prisma.podcastEpisode.count(),
-    prisma.writer.count(),
+    prisma.profile.count({ where: { role: "WRITER" } }),
   ]);
 
   return {

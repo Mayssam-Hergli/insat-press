@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Writer } from "@/generated/prisma/client";
+import type { Profile } from "@/generated/prisma/client";
 import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
 import StatusSelect from "./StatusSelect";
+import ArticleCoverPicker from "./ArticleCoverPicker";
 
 type ArticleAddFormProps = {
-  writers: Writer[];
+  writers: Profile[];
   canPublish: boolean;
 };
 
@@ -18,13 +19,14 @@ export default function ArticleAddForm ({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [draftId, setDraftId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
     category: "",
     description: "",
-    coverImage:"",
     coverLabel: "",
     sourceUrl:  "",
     displayDate:  "",
@@ -38,19 +40,41 @@ export default function ArticleAddForm ({
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/admin/articles/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to add article");
+      let id = draftId;
+      if (!id) {
+        const response = await fetch(`/api/admin/articles/`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...formData, status: undefined }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Failed to create the draft");
+        id = String(data.id);
+        setDraftId(id);
+      } else {
+        const response = await fetch(`/api/admin/articles/${id}`, {
+          method: "PATCH", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...formData, status: undefined }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Failed to update the draft");
       }
 
-      router.push("/admin/articles");
-      router.refresh();
+      if (coverFile) {
+        const upload = new FormData();
+        upload.set("file", coverFile);
+        const response = await fetch(`/api/admin/articles/${id}/cover`, { method: "POST", body: upload });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(`${data.error || "Cover upload failed"} The draft was kept; retry to continue.`);
+      }
+
+      const transition = await fetch(`/api/admin/articles/${id}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: formData.status }),
+      });
+      const transitionData = await transition.json().catch(() => ({}));
+      if (!transition.ok) throw new Error(`${transitionData.error || "Status update failed"} The draft was kept; retry to continue.`);
+
+      router.push("/admin/articles?saved=1");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       setLoading(false);
@@ -143,20 +167,8 @@ export default function ArticleAddForm ({
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="coverImage" className="admin-label">
-              Cover Image URL
-            </label>
-            <input
-              type="url"
-              id="coverImage"
-              value={formData.coverImage}
-              onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-              className="admin-input"
-            />
-          </div>
-
+        <div className="grid gap-4 md:grid-cols-2">
+          <ArticleCoverPicker file={coverFile} onFileChange={setCoverFile} />
           <div>
             <label htmlFor="coverLabel" className="admin-label">
               Cover Label
@@ -207,7 +219,9 @@ export default function ArticleAddForm ({
             Writers
           </label>
           <div className="text-sm text-[var(--muted)]">
-            Current writers: {writers.map((w) => w.name).join(", ") || "None"}
+            Available writers: {writers
+              .map((writer) => writer.fullName ?? writer.email)
+              .join(", ") || "None"}
           </div>
           <p className="mt-1 text-xs text-[var(--muted)]">
             Note: Writer management will be implemented in a future update

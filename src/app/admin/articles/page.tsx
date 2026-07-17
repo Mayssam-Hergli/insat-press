@@ -4,8 +4,15 @@ import { requireAuth } from "@/lib/auth/session";
 import { canAccessSection, isAdmin } from "@/lib/auth/permissions";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import DeleteArticleButton from "@/components/admin/DeleteArticleButton";
+import ArticleCoverImage from "@/components/articles/ArticleCoverImage";
 
-export default async function AdminArticlesPage() {
+type AdminArticlesPageProps = {
+  searchParams: Promise<{ saved?: string }>;
+};
+
+export default async function AdminArticlesPage({ searchParams }: AdminArticlesPageProps) {
+  const { saved } = await searchParams;
   const profile = await requireAuth();
   if (!canAccessSection(profile.role, "articles")) {
     redirect("/admin");
@@ -18,6 +25,15 @@ export default async function AdminArticlesPage() {
 
   return (
     <div>
+      {saved === "1" && (
+        <div
+          role="status"
+          className="mb-6 rounded-xl border border-green-700/30 bg-green-50 px-4 py-3 text-sm font-bold text-green-800"
+        >
+          Article saved successfully.
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="font-serif-display text-3xl font-bold text-[var(--ink)]">
           Articles
@@ -54,9 +70,18 @@ export default async function AdminArticlesPage() {
                 key={article.id.toString()}
                 className="transition-colors hover:bg-[rgba(255,248,243,0.55)]"
               >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-bold text-[var(--ink)]">
-                    {article.title}
+                <td className="px-6 py-4">
+                  <div className="flex min-w-56 items-center gap-3">
+                    <ArticleCoverImage
+                      path={article.coverImage}
+                      alt={`${article.title} cover`}
+                      label={article.coverLabel}
+                      className="h-14 w-20 shrink-0 rounded-lg"
+                      sizes="80px"
+                    />
+                    <div className="text-sm font-bold text-[var(--ink)]">
+                      {article.title}
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -70,24 +95,16 @@ export default async function AdminArticlesPage() {
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link
-                    href={`/writing/${article.slug}`}
+                    href={`/admin/articles/${article.id}/preview`}
                     className="mr-4 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
                   >
                     View
                   </Link>
-                  <Link
-                    href={`/admin/articles/${article.id}/edit`}
-                    className="mr-4 font-bold text-[var(--press-red)] hover:underline"
-                  >
-                    Edit
-                  </Link>
+                  {(isAdmin(profile.role) || article.status === "DRAFT") && (
+                    <Link href={`/admin/articles/${article.id}/edit`} className="mr-4 font-bold text-[var(--press-red)] hover:underline">Edit</Link>
+                  )}
                   {isAdmin(profile.role) && (
-                    <Link
-                      href={`/admin/articles/${article.id}/`}
-                      className="text-[var(--muted)] transition-colors hover:text-[var(--press-red)]"
-                    >
-                      Delete
-                    </Link>
+                    <DeleteArticleButton id={article.id.toString()} />
                   )}
                 </td>
               </tr>
