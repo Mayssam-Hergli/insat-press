@@ -17,26 +17,24 @@ const mediaCoverageOrderBy = [
   { createdAt: "desc" },
 ] satisfies Prisma.MediaCoverageOrderByWithRelationInput[];
 
-const mediaCoverageWithGalleryInclude = {
-  contributors: {
-    include: {
-      profile: true,
-    },
-    orderBy: {
-      sortOrder: "asc",
-    },
-  },
+const mediaCoverageWithRelationsInclude = {
   gallery: {
     orderBy: {
       sortOrder: "asc",
     },
   },
+  contributors: {
+    include: {
+      profile: true,
+    },
+    orderBy: [{ role: "asc" }, { sortOrder: "asc" }],
+  },
   createdBy: true,
   updatedBy: true,
 } satisfies Prisma.MediaCoverageInclude;
 
-export type MediaCoverageWithGallery = Prisma.MediaCoverageGetPayload<{
-  include: typeof mediaCoverageWithGalleryInclude;
+export type MediaCoverageWithRelations = Prisma.MediaCoverageGetPayload<{
+  include: typeof mediaCoverageWithRelationsInclude;
 }>;
 
 export type MediaCoverageFilters = PaginationOptions & {
@@ -47,7 +45,7 @@ export type MediaCoverageFilters = PaginationOptions & {
 
 export function getAllMediaCoverage(
   filters: MediaCoverageFilters = {}
-): Promise<MediaCoverageWithGallery[]> {
+): Promise<MediaCoverageWithRelations[]> {
   return runDataQuery("get all media coverage", () =>
     getPrisma().mediaCoverage.findMany({
       where: {
@@ -55,7 +53,7 @@ export function getAllMediaCoverage(
         type: filters.type,
         createdById: filters.createdById,
       },
-      include: mediaCoverageWithGalleryInclude,
+      include: mediaCoverageWithRelationsInclude,
       orderBy: mediaCoverageOrderBy,
       skip: filters.skip,
       take: filters.take,
@@ -65,7 +63,7 @@ export function getAllMediaCoverage(
 
 export function getPublishedMediaCoverage(
   options: PaginationOptions = {}
-): Promise<MediaCoverageWithGallery[]> {
+): Promise<MediaCoverageWithRelations[]> {
   return getAllMediaCoverage({
     ...options,
     status: ContentStatus.PUBLISHED,
@@ -74,33 +72,33 @@ export function getPublishedMediaCoverage(
 
 export function getMediaCoverageById(
   id: EntityId
-): Promise<MediaCoverageWithGallery | null> {
+): Promise<MediaCoverageWithRelations | null> {
   return runDataQuery(`get media coverage by id ${String(id)}`, () =>
     getPrisma().mediaCoverage.findUnique({
       where: { id: toBigIntId(id) },
-      include: mediaCoverageWithGalleryInclude,
+      include: mediaCoverageWithRelationsInclude,
     })
   );
 }
 
 export function getMediaCoverageBySlug(
   slug: string
-): Promise<MediaCoverageWithGallery | null> {
+): Promise<MediaCoverageWithRelations | null> {
   return runDataQuery(`get media coverage by slug ${slug}`, () =>
     getPrisma().mediaCoverage.findUnique({
       where: { slug },
-      include: mediaCoverageWithGalleryInclude,
+      include: mediaCoverageWithRelationsInclude,
     })
   );
 }
 
 export function getMediaCoverageByTitle(
   title: string
-): Promise<MediaCoverageWithGallery | null> {
+): Promise<MediaCoverageWithRelations | null> {
   return runDataQuery(`get media coverage by title ${title}`, () =>
     getPrisma().mediaCoverage.findFirst({
       where: { title },
-      include: mediaCoverageWithGalleryInclude,
+      include: mediaCoverageWithRelationsInclude,
       orderBy: mediaCoverageOrderBy,
     })
   );

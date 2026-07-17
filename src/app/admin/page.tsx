@@ -27,7 +27,7 @@ async function getDashboardStats() {
     publishedEvents,
     mediaCoverageCount,
     podcastEpisodeCount,
-    writerCount,
+    teamCount,
   ] = await Promise.all([
     prisma.article.count({ where: { status: ContentStatus.DRAFT } }),
     prisma.article.count({ where: { status: ContentStatus.PUBLISHED } }),
@@ -35,7 +35,7 @@ async function getDashboardStats() {
     prisma.event.count({ where: { status: ContentStatus.PUBLISHED } }),
     prisma.mediaCoverage.count(),
     prisma.podcastEpisode.count(),
-    prisma.profile.count({ where: { role: "WRITER" } }),
+    prisma.profile.count(),
   ]);
 
   return {
@@ -47,7 +47,7 @@ async function getDashboardStats() {
     publishedEvents,
     mediaCoverageCount,
     podcastEpisodeCount,
-    writerCount,
+    teamCount,
   };
 }
 
@@ -176,9 +176,9 @@ export default async function AdminDashboard() {
             href="/admin/podcast"
           />
           <StatCard
-            title="Writers"
-            value={stats.writerCount}
-            href="/admin/writers"
+            title="Team"
+            value={stats.teamCount}
+            href="/admin/team"
           />
         </div>
       </div>

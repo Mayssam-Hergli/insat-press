@@ -96,7 +96,7 @@ export default function EventAddForm() {
         </div>
 
         {/* Type and Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="type" className="admin-label">
               Type *
@@ -129,7 +129,7 @@ export default function EventAddForm() {
         </div>
 
         {/* Edition and Location */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="edition" className="admin-label">
               Edition
@@ -173,7 +173,7 @@ export default function EventAddForm() {
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coverImage" className="admin-label">
               Cover Image URL
@@ -202,7 +202,7 @@ export default function EventAddForm() {
         </div>
 
         {/* Starts At and Display Date */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="startsAt" className="admin-label">
               Starts At

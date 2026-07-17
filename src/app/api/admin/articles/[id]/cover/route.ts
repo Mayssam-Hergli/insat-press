@@ -38,7 +38,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     await uploadArticleImage(newPath, output);
 
     try {
-      await updateArticle(id, { coverImage: newPath, updatedById: access.profile.id });
+      await updateArticle(id, { coverImage: newPath, updatedBy: { connect: { id: access.profile.id } } });
     } catch (error) {
       try { await removeArticleImage(newPath); } catch (rollbackError) {
         console.error("Cover upload rollback failed:", rollbackError);
@@ -69,7 +69,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
     const oldPath = access.article.coverImage;
 
     // Break the public database reference first, then clean up the object.
-    await updateArticle(id, { coverImage: null, updatedById: access.profile.id });
+    await updateArticle(id, { coverImage: null, updatedBy: { connect: { id: access.profile.id } } });
     if (isManagedArticleImagePath(oldPath)) {
       try { await removeArticleImage(oldPath); }
       catch (error) {

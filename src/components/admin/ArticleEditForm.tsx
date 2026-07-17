@@ -2,18 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { ArticleWithWriters } from "@/lib/data/articles";
+import type { ArticleWithContributors } from "@/lib/data/articles";
+import type { Profile } from "@/generated/prisma/client";
 import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
 import StatusSelect from "./StatusSelect";
+import ContributorSelect from "./ContributorSelect";
 import ArticleCoverPicker from "./ArticleCoverPicker";
 
 type ArticleEditFormProps = {
-  article: ArticleWithWriters;
+  article: ArticleWithContributors;
+  profiles: Profile[];
   canPublish: boolean;
 };
 
 export default function ArticleEditForm({
   article,
+  profiles,
   canPublish,
 }: ArticleEditFormProps) {
   const router = useRouter();
@@ -21,6 +25,9 @@ export default function ArticleEditForm({
   const [error, setError] = useState("");
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [removeCover, setRemoveCover] = useState(false);
+  const [writerIds, setWriterIds] = useState<string[]>(
+    article.writers.map((w) => w.profileId)
+  );
 
   const [formData, setFormData] = useState({
     title: article.title,
@@ -43,7 +50,7 @@ export default function ArticleEditForm({
       const response = await fetch(`/api/admin/articles/${article.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, status: undefined }),
+        body: JSON.stringify({ ...formData, status: undefined, writerIds }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Failed to update article");
@@ -118,7 +125,7 @@ export default function ArticleEditForm({
         </div>
 
         {/* Category and Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="category" className="admin-label">
               Category *
@@ -184,7 +191,7 @@ export default function ArticleEditForm({
         </div>
 
         {/* Source URL and Display Date */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="sourceUrl" className="admin-label">
               Source URL
@@ -214,19 +221,12 @@ export default function ArticleEditForm({
         </div>
 
         {/* Writers */}
-        <div>
-          <label className="admin-label">
-            Writers
-          </label>
-          <div className="text-sm text-[var(--muted)]">
-            Current writers: {article.writers
-              .map(({ profile }) => profile.fullName ?? profile.email)
-              .join(", ") || "None"}
-          </div>
-          <p className="mt-1 text-xs text-[var(--muted)]">
-            Note: Writer management will be implemented in a future update
-          </p>
-        </div>
+        <ContributorSelect
+          profiles={profiles}
+          value={writerIds}
+          onChange={setWriterIds}
+          label="Writers"
+        />
 
         {/* Content */}
         <div>

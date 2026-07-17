@@ -1,4 +1,5 @@
 import { getArticleById } from "@/lib/data/articles";
+import { getAllProfiles } from "@/lib/data/profiles";
 import { notFound, redirect } from "next/navigation";
 import ArticleEditForm from "@/components/admin/ArticleEditForm";
 import { requireAuth } from "@/lib/auth/session";
@@ -11,7 +12,10 @@ export default async function EditArticlePage({
 }) {
   const profile = await requireAuth();
   const { id } = await params;
-  const article = await getArticleById(id);
+  const [article, profiles] = await Promise.all([
+    getArticleById(id),
+    getAllProfiles(),
+  ]);
 
   if (!article) {
     notFound();
@@ -33,6 +37,7 @@ export default async function EditArticlePage({
 
       <ArticleEditForm
         article={article}
+        profiles={profiles}
         canPublish={canPublish(profile.role)}
       />
     </div>

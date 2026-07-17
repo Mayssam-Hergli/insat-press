@@ -7,26 +7,51 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ContentStatus {
+  DRAFT     @map("draft")
+  PENDING   @map("pending")
+  PUBLISHED @map("published")
+  ARCHIVED  @map("archived")
+
+  @@map("content_status")
+}
+
+enum AdminRole {
+  ADMIN  @map("admin")
+  WRITER @map("writer")
+  MEDIA  @map("media")
+
+  @@map("admin_role")
+}
+
+enum ContributorRole {
+  COVERED_BY @map("covered_by")
+  EDITED_BY  @map("edited_by")
+
+  @@map("contributor_role")
+}
+
 model Profile {
-  id                          String                        @id @db.Uuid
-  email                       String                        @unique
-  fullName                    String?                       @map("full_name")
-  role                        AdminRole                     @default(WRITER)
-  createdAt                   DateTime                      @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                   DateTime                      @updatedAt @map("updated_at") @db.Timestamptz(6)
-  avatarUrl                   String?                       @map("avatar_url")
-  bio                         String?
-  slug                        String?                       @unique
-  articleWriters              ArticleWriter[]
-  articlesCreated             Article[]                     @relation("ArticleCreatedBy")
-  articlesUpdated             Article[]                     @relation("ArticleUpdatedBy")
-  eventsCreated               Event[]                       @relation("EventCreatedBy")
-  eventsUpdated               Event[]                       @relation("EventUpdatedBy")
-  mediaCreated                MediaCoverage[]               @relation("MediaCreatedBy")
-  mediaUpdated                MediaCoverage[]               @relation("MediaUpdatedBy")
-  mediaCoverageContributions  MediaCoverageContributor[]
-  podcastsCreated             PodcastEpisode[]              @relation("PodcastCreatedBy")
-  podcastsUpdated             PodcastEpisode[]              @relation("PodcastUpdatedBy")
+  id        String    @id @db.Uuid
+  email     String    @unique
+  fullName  String?   @map("full_name")
+  slug      String?   @unique
+  bio       String?
+  avatarUrl String?   @map("avatar_url")
+  role      AdminRole @default(WRITER)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  articlesCreated    Article[]                  @relation("ArticleCreatedBy")
+  articlesUpdated    Article[]                  @relation("ArticleUpdatedBy")
+  eventsCreated      Event[]                    @relation("EventCreatedBy")
+  eventsUpdated      Event[]                    @relation("EventUpdatedBy")
+  mediaCreated       MediaCoverage[]            @relation("MediaCreatedBy")
+  mediaUpdated       MediaCoverage[]            @relation("MediaUpdatedBy")
+  podcastsCreated    PodcastEpisode[]           @relation("PodcastCreatedBy")
+  podcastsUpdated    PodcastEpisode[]           @relation("PodcastUpdatedBy")
+  articles           ArticleWriter[]
+  mediaContributions MediaCoverageContributor[]
 
   @@map("profiles")
 }
@@ -61,14 +86,14 @@ model Article {
 
 model ArticleWriter {
   articleId BigInt  @map("article_id")
-  sortOrder Int     @default(0) @map("sort_order")
   profileId String  @map("profile_id") @db.Uuid
+  sortOrder Int     @default(0) @map("sort_order")
   article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  profile   Profile @relation(fields: [profileId], references: [id])
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Restrict)
 
   @@id([articleId, profileId])
-  @@index([articleId, sortOrder])
   @@index([profileId])
+  @@index([articleId, sortOrder])
   @@map("article_writers")
 }
 
@@ -114,6 +139,7 @@ model PodcastEpisode {
   coverImage  String?       @map("cover_image")
   coverLabel  String?       @map("cover_label")
   youtubeUrl  String        @map("youtube_url")
+  spotifyUrl  String        @map("spotify_url")
   displayDate String?       @map("display_date")
   releasedAt  DateTime?     @map("released_at") @db.Timestamptz(6)
   status      ContentStatus @default(DRAFT)
@@ -122,7 +148,6 @@ model PodcastEpisode {
   updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
   createdById String?       @map("created_by_id") @db.Uuid
   updatedById String?       @map("updated_by_id") @db.Uuid
-  spotifyUrl  String        @map("spotify_url")
   createdBy   Profile?      @relation("PodcastCreatedBy", fields: [createdById], references: [id])
   updatedBy   Profile?      @relation("PodcastUpdatedBy", fields: [updatedById], references: [id])
 
@@ -134,27 +159,27 @@ model PodcastEpisode {
 }
 
 model MediaCoverage {
-  id                          BigInt                        @id @default(autoincrement())
-  slug                        String                        @unique
-  title                       String
-  eventName                   String                        @map("event_name")
-  type                        String
-  description                 String
-  content                     String                        @default("")
-  coverImage                  String?                       @map("cover_image")
-  coverLabel                  String?                       @map("cover_label")
-  displayDate                 String?                       @map("display_date")
-  coveredAt                   DateTime?                     @map("covered_at") @db.Timestamptz(6)
-  status                      ContentStatus                 @default(DRAFT)
-  publishedAt                 DateTime?                     @map("published_at") @db.Timestamptz(6)
-  createdAt                   DateTime                      @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                   DateTime                      @updatedAt @map("updated_at") @db.Timestamptz(6)
-  createdById                 String?                       @map("created_by_id") @db.Uuid
-  updatedById                 String?                       @map("updated_by_id") @db.Uuid
-  createdBy                   Profile?                      @relation("MediaCreatedBy", fields: [createdById], references: [id])
-  updatedBy                   Profile?                      @relation("MediaUpdatedBy", fields: [updatedById], references: [id])
-  contributors                MediaCoverageContributor[]
-  gallery                     MediaGalleryImage[]
+  id           BigInt                     @id @default(autoincrement())
+  slug         String                     @unique
+  title        String
+  eventName    String                     @map("event_name")
+  type         String
+  description  String
+  content      String                     @default("")
+  coverImage   String?                    @map("cover_image")
+  coverLabel   String?                    @map("cover_label")
+  displayDate  String?                    @map("display_date")
+  coveredAt    DateTime?                  @map("covered_at") @db.Timestamptz(6)
+  status       ContentStatus              @default(DRAFT)
+  publishedAt  DateTime?                  @map("published_at") @db.Timestamptz(6)
+  createdAt    DateTime                   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime                   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdById  String?                    @map("created_by_id") @db.Uuid
+  updatedById  String?                    @map("updated_by_id") @db.Uuid
+  createdBy    Profile?                   @relation("MediaCreatedBy", fields: [createdById], references: [id])
+  updatedBy    Profile?                   @relation("MediaUpdatedBy", fields: [updatedById], references: [id])
+  gallery      MediaGalleryImage[]
+  contributors MediaCoverageContributor[]
 
   @@index([status, publishedAt])
   @@index([type])
@@ -162,6 +187,20 @@ model MediaCoverage {
   @@index([createdById])
   @@index([updatedById])
   @@map("media_coverage")
+}
+
+model MediaCoverageContributor {
+  mediaCoverageId BigInt          @map("media_coverage_id")
+  profileId       String          @map("profile_id") @db.Uuid
+  role            ContributorRole
+  sortOrder       Int             @default(0) @map("sort_order")
+  mediaCoverage   MediaCoverage   @relation(fields: [mediaCoverageId], references: [id], onDelete: Cascade)
+  profile         Profile         @relation(fields: [profileId], references: [id], onDelete: Restrict)
+
+  @@id([mediaCoverageId, profileId, role])
+  @@index([profileId])
+  @@index([mediaCoverageId, role, sortOrder])
+  @@map("media_coverage_contributors")
 }
 
 model MediaGalleryImage {
@@ -178,43 +217,4 @@ model MediaGalleryImage {
 
   @@index([mediaCoverageId, sortOrder])
   @@map("media_gallery_images")
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model MediaCoverageContributor {
-  mediaCoverageId BigInt          @map("media_coverage_id")
-  profileId       String          @map("profile_id") @db.Uuid
-  role            ContributorRole
-  sortOrder       Int             @default(0) @map("sort_order")
-  mediaCoverage   MediaCoverage   @relation(fields: [mediaCoverageId], references: [id], onDelete: Cascade)
-  profile         Profile         @relation(fields: [profileId], references: [id])
-
-  @@id([mediaCoverageId, profileId, role])
-  @@index([mediaCoverageId, role, sortOrder])
-  @@index([profileId])
-  @@map("media_coverage_contributors")
-}
-
-enum ContentStatus {
-  DRAFT     @map("draft")
-  PENDING   @map("pending")
-  PUBLISHED @map("published")
-  ARCHIVED  @map("archived")
-
-  @@map("content_status")
-}
-
-enum AdminRole {
-  ADMIN  @map("admin")
-  WRITER @map("writer")
-  MEDIA  @map("media")
-
-  @@map("admin_role")
-}
-
-enum ContributorRole {
-  COVERED_BY @map("covered_by")
-  EDITED_BY  @map("edited_by")
-
-  @@map("contributor_role")
 }

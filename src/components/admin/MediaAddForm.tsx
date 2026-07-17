@@ -2,18 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { Profile } from "@/generated/prisma/client";
 import MarkdownEditor from "./MarkdownEditor";
 import { dateTimeLocalToISO } from "@/lib/admin/datetime";
 import StatusSelect from "./StatusSelect";
+import ContributorSelect from "./ContributorSelect";
 
 export default function MediaAddForm({
+  profiles,
   canPublish,
 }: {
+  profiles: Profile[];
   canPublish: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [coveredByIds, setCoveredByIds] = useState<string[]>([]);
+  const [editedByIds, setEditedByIds] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -41,6 +47,8 @@ export default function MediaAddForm({
         body: JSON.stringify({
           ...formData,
           coveredAt: dateTimeLocalToISO(formData.coveredAt),
+          coveredByIds,
+          editedByIds,
         }),
       });
 
@@ -100,7 +108,7 @@ export default function MediaAddForm({
         </div>
 
         {/* Type and Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="type" className="admin-label">
               Type *
@@ -127,12 +135,21 @@ export default function MediaAddForm({
           </div>
         </div>
 
-        <div>
-          <label className="admin-label">Contributors</label>
-          <p className="text-sm text-[var(--muted)]">
-            Coverage and editing contributors are linked to team profiles and
-            can be assigned after the media entry is created.
-          </p>
+        {/* Covered By and Edited By */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <ContributorSelect
+            profiles={profiles}
+            value={coveredByIds}
+            onChange={setCoveredByIds}
+            label="Covered By"
+          />
+
+          <ContributorSelect
+            profiles={profiles}
+            value={editedByIds}
+            onChange={setEditedByIds}
+            label="Edited By"
+          />
         </div>
 
         {/* Event Name */}
@@ -166,7 +183,7 @@ export default function MediaAddForm({
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coverImage" className="admin-label">
               Cover Image URL
@@ -195,7 +212,7 @@ export default function MediaAddForm({
         </div>
 
         {/* Covered At and Display Date */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coveredAt" className="admin-label">
               Covered At

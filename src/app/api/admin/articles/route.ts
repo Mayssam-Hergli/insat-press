@@ -3,6 +3,7 @@ import { getCurrentProfile } from "@/lib/auth/session";
 import { canAccessSection } from "@/lib/auth/permissions";
 import { ArticleInputError, parseNewArticleInput } from "@/lib/articles/input";
 import { createArticle, getArticleBySlug, getArticleByTitle } from "@/lib/data/articles";
+import { setArticleWriters } from "@/lib/data/articleWriters";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +13,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 });
     }
 
-    const { data } = parseNewArticleInput(await request.json());
+    const body = await request.json();
+    const writerIds = Array.isArray(body.writerIds)
+      ? body.writerIds.filter((value: unknown): value is string => typeof value === "string")
+      : [];
+    const { data } = parseNewArticleInput(body);
     const duplicate = (await getArticleByTitle(data.title)) || (await getArticleBySlug(data.slug));
     if (duplicate) return NextResponse.json({ error: "An article with this title or slug already exists" }, { status: 409 });
 
@@ -22,9 +27,10 @@ export async function POST(request: NextRequest) {
       ...data,
       status: "DRAFT",
       publishedAt: null,
-      createdById: profile.id,
-      updatedById: profile.id,
+      createdBy: { connect: { id: profile.id } },
+      updatedBy: { connect: { id: profile.id } },
     });
+    await setArticleWriters(article.id, writerIds);
     return NextResponse.json({ ...article, id: article.id.toString() }, { status: 201 });
   } catch (error) {
     if (error instanceof ArticleInputError) {

@@ -1,4 +1,5 @@
 import { getMediaCoverageById } from "@/lib/data/mediaCoverage";
+import { getAllProfiles } from "@/lib/data/profiles";
 import { notFound, redirect } from "next/navigation";
 import MediaEditForm from "@/components/admin/MediaEditForm";
 import { requireAuth } from "@/lib/auth/session";
@@ -11,7 +12,10 @@ export default async function EditMediaPage({
 }) {
   const profile = await requireAuth();
   const { id } = await params;
-  const media = await getMediaCoverageById(id);
+  const [media, profiles] = await Promise.all([
+    getMediaCoverageById(id),
+    getAllProfiles(),
+  ]);
 
   if (!media) {
     notFound();
@@ -31,7 +35,7 @@ export default async function EditMediaPage({
         </p>
       </div>
 
-      <MediaEditForm media={media} canPublish={canPublish(profile.role)} />
+      <MediaEditForm media={media} profiles={profiles} canPublish={canPublish(profile.role)} />
     </div>
   );
 }

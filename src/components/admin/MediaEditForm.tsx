@@ -2,28 +2,29 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { MediaCoverageWithGallery } from "@/lib/data/mediaCoverage";
+import type { MediaCoverageWithRelations } from "@/lib/data/mediaCoverage";
+import type { Profile } from "@/generated/prisma/client";
 import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
 import { toDateTimeLocalValue, dateTimeLocalToISO } from "@/lib/admin/datetime";
 import StatusSelect from "./StatusSelect";
+import ContributorSelect from "./ContributorSelect";
 
 type MediaEditFormProps = {
-  media: MediaCoverageWithGallery;
+  media: MediaCoverageWithRelations;
+  profiles: Profile[];
   canPublish: boolean;
 };
 
-export default function MediaEditForm({ media, canPublish }: MediaEditFormProps) {
+export default function MediaEditForm({ media, profiles, canPublish }: MediaEditFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const coveredBy = media.contributors
-    .filter((contributor) => contributor.role === "COVERED_BY")
-    .map(({ profile }) => profile.fullName ?? profile.email)
-    .join(", ");
-  const editedBy = media.contributors
-    .filter((contributor) => contributor.role === "EDITED_BY")
-    .map(({ profile }) => profile.fullName ?? profile.email)
-    .join(", ");
+  const [coveredByIds, setCoveredByIds] = useState<string[]>(
+    media.contributors.filter((c) => c.role === "COVERED_BY").map((c) => c.profileId)
+  );
+  const [editedByIds, setEditedByIds] = useState<string[]>(
+    media.contributors.filter((c) => c.role === "EDITED_BY").map((c) => c.profileId)
+  );
 
   const [formData, setFormData] = useState({
     title: media.title,
@@ -51,6 +52,8 @@ export default function MediaEditForm({ media, canPublish }: MediaEditFormProps)
         body: JSON.stringify({
           ...formData,
           coveredAt: dateTimeLocalToISO(formData.coveredAt),
+          coveredByIds,
+          editedByIds,
         }),
       });
 
@@ -110,7 +113,7 @@ export default function MediaEditForm({ media, canPublish }: MediaEditFormProps)
         </div>
 
         {/* Type and Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="type" className="admin-label">
               Type *
@@ -137,17 +140,21 @@ export default function MediaEditForm({ media, canPublish }: MediaEditFormProps)
           </div>
         </div>
 
-        {/* Contributors */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="admin-label">Covered By</label>
-            <p className="text-sm text-[var(--muted)]">{coveredBy || "None"}</p>
-          </div>
+        {/* Covered By and Edited By */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <ContributorSelect
+            profiles={profiles}
+            value={coveredByIds}
+            onChange={setCoveredByIds}
+            label="Covered By"
+          />
 
-          <div>
-            <label className="admin-label">Edited By</label>
-            <p className="text-sm text-[var(--muted)]">{editedBy || "None"}</p>
-          </div>
+          <ContributorSelect
+            profiles={profiles}
+            value={editedByIds}
+            onChange={setEditedByIds}
+            label="Edited By"
+          />
         </div>
 
         {/* Event Name */}
@@ -181,7 +188,7 @@ export default function MediaEditForm({ media, canPublish }: MediaEditFormProps)
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coverImage" className="admin-label">
               Cover Image URL
@@ -210,7 +217,7 @@ export default function MediaEditForm({ media, canPublish }: MediaEditFormProps)
         </div>
 
         {/* Covered At and Display Date */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="coveredAt" className="admin-label">
               Covered At

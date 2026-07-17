@@ -6,14 +6,15 @@ import type { Profile } from "@/generated/prisma/client";
 import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
 import StatusSelect from "./StatusSelect";
 import ArticleCoverPicker from "./ArticleCoverPicker";
+import ContributorSelect from "./ContributorSelect";
 
 type ArticleAddFormProps = {
-  writers: Profile[];
+  profiles: Profile[];
   canPublish: boolean;
 };
 
 export default function ArticleAddForm ({
-  writers,
+  profiles,
   canPublish,
 }: ArticleAddFormProps) {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function ArticleAddForm ({
   const [error, setError] = useState("");
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [draftId, setDraftId] = useState<string | null>(null);
+  const [writerIds, setWriterIds] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -44,7 +46,7 @@ export default function ArticleAddForm ({
       if (!id) {
         const response = await fetch(`/api/admin/articles/`, {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...formData, status: undefined }),
+          body: JSON.stringify({ ...formData, status: undefined, writerIds }),
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || "Failed to create the draft");
@@ -53,7 +55,7 @@ export default function ArticleAddForm ({
       } else {
         const response = await fetch(`/api/admin/articles/${id}`, {
           method: "PATCH", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...formData, status: undefined }),
+          body: JSON.stringify({ ...formData, status: undefined, writerIds }),
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || "Failed to update the draft");
@@ -124,7 +126,7 @@ export default function ArticleAddForm ({
         </div>
 
         {/* Category and Status */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="category" className="admin-label">
               Category *
@@ -184,7 +186,7 @@ export default function ArticleAddForm ({
         </div>
 
         {/* Source URL and Display Date */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="sourceUrl" className="admin-label">
               Source URL
@@ -214,19 +216,12 @@ export default function ArticleAddForm ({
         </div>
 
         {/* Writers */}
-        <div>
-          <label className="admin-label">
-            Writers
-          </label>
-          <div className="text-sm text-[var(--muted)]">
-            Available writers: {writers
-              .map((writer) => writer.fullName ?? writer.email)
-              .join(", ") || "None"}
-          </div>
-          <p className="mt-1 text-xs text-[var(--muted)]">
-            Note: Writer management will be implemented in a future update
-          </p>
-        </div>
+        <ContributorSelect
+          profiles={profiles}
+          value={writerIds}
+          onChange={setWriterIds}
+          label="Writers"
+        />
 
         {/* Content */}
         <div>

@@ -44,3 +44,13 @@ export type PaginationOptions = {
   skip?: number;
   take?: number;
 };
+
+export function slugify(text: string): string {
+  return text
+    .normalize("NFKD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}

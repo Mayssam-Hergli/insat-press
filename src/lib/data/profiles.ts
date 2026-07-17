@@ -1,6 +1,6 @@
 import type { Prisma, Profile } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/db/prisma";
-import { runDataQuery, type PaginationOptions } from "./utils";
+import { runDataQuery, slugify, type PaginationOptions } from "./utils";
 
 const profileOrderBy = { createdAt: "desc" } satisfies Prisma.ProfileOrderByWithRelationInput;
 
@@ -16,6 +16,20 @@ export function getAllProfiles(
   );
 }
 
+export function searchProfiles(query: string): Promise<Profile[]> {
+  return runDataQuery(`search profiles "${query}"`, () =>
+    getPrisma().profile.findMany({
+      where: {
+        OR: [
+          { fullName: { contains: query, mode: "insensitive" } },
+          { email: { contains: query, mode: "insensitive" } },
+        ],
+      },
+      orderBy: profileOrderBy,
+    })
+  );
+}
+
 export function getProfileById(id: string): Promise<Profile | null> {
   return runDataQuery(`get profile by id ${id}`, () =>
     getPrisma().profile.findUnique({ where: { id } })
@@ -26,6 +40,41 @@ export function getProfileByEmail(email: string): Promise<Profile | null> {
   return runDataQuery(`get profile by email ${email}`, () =>
     getPrisma().profile.findUnique({ where: { email } })
   );
+}
+
+export function getProfileBySlug(slug: string): Promise<Profile | null> {
+  return runDataQuery(`get profile by slug ${slug}`, () =>
+    getPrisma().profile.findUnique({ where: { slug } })
+  );
+}
+
+export async function generateUniqueProfileSlug(fullName: string): Promise<string> {
+  return runDataQuery(`generate unique profile slug for "${fullName}"`, async () => {
+    const prisma = getPrisma();
+    const base = slugify(fullName) || "member";
+
+    let candidate = base;
+    let suffix = 1;
+    while (await prisma.profile.findUnique({ where: { slug: candidate } })) {
+      suffix += 1;
+      candidate = `${base}-${suffix}`;
+    }
+
+    return candidate;
+  });
+}
+
+export async function countProfileContributions(
+  id: string
+): Promise<{ articleCount: number; mediaCount: number }> {
+  return runDataQuery(`count contributions for profile ${id}`, async () => {
+    const prisma = getPrisma();
+    const [articleCount, mediaCount] = await Promise.all([
+      prisma.articleWriter.count({ where: { profileId: id } }),
+      prisma.mediaCoverageContributor.count({ where: { profileId: id } }),
+    ]);
+    return { articleCount, mediaCount };
+  });
 }
 
 export function createProfile(data: Prisma.ProfileCreateInput): Promise<Profile> {

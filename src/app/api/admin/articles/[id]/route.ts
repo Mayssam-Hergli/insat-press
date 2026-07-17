@@ -5,6 +5,7 @@ import { ArticleInputError, parseArticlePatch } from "@/lib/articles/input";
 import { deleteArticle, getArticleById, updateArticle } from "@/lib/data/articles";
 import { removeArticleImage } from "@/lib/storage/article-images-server";
 import { isManagedArticleImagePath } from "@/lib/storage/article-images";
+import { setArticleWriters } from "@/lib/data/articleWriters";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -17,7 +18,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: "This article is locked or you do not own it" }, { status: 403 });
     }
 
-    const { data, requestedStatus } = parseArticlePatch(await request.json());
+    const body = await request.json();
+    const writerIds = Array.isArray(body.writerIds)
+      ? body.writerIds.filter((value: unknown): value is string => typeof value === "string")
+      : undefined;
+    const { data, requestedStatus } = parseArticlePatch(body);
     const status = requestedStatus
       ? resolveWriteStatus(profile.role, requestedStatus)
       : article.status;
@@ -28,8 +33,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       ...data,
       status,
       publishedAt,
-      updatedById: profile.id,
+      updatedBy: { connect: { id: profile.id } },
     });
+    if (writerIds !== undefined) await setArticleWriters(id, writerIds);
     return NextResponse.json({ ...updated, id: updated.id.toString() });
   } catch (error) {
     if (error instanceof ArticleInputError) {

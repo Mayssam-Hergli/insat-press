@@ -1,8 +1,8 @@
-import type { ArticleWithWriters } from "@/lib/data/articles";
+import type { ArticleWithContributors } from "@/lib/data/articles";
 import ArticleCoverImage from "@/components/articles/ArticleCoverImage";
 
 type ArticleCardProps = {
-  article: ArticleWithWriters;
+  article: ArticleWithContributors;
 };
 
 export default function ArticleCard({ article }: ArticleCardProps) {

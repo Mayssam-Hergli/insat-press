@@ -5,6 +5,7 @@ import {
   createMediaCoverage,
   getMediaCoverageByTitle,
 } from "@/lib/data/mediaCoverage";
+import { setMediaCoverageContributors } from "@/lib/data/mediaCoverageContributors";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const { coveredByIds, editedByIds, ...body } = await request.json();
 
     // Prevent duplicate titles
     const existing = await getMediaCoverageByTitle(body.title);
@@ -37,6 +38,11 @@ export async function POST(request: NextRequest) {
       publishedAt: status === "PUBLISHED" ? new Date() : null,
       createdById: profile.id,
       updatedById: profile.id,
+    });
+
+    await setMediaCoverageContributors(newMedia.id, {
+      coveredByIds: coveredByIds ?? [],
+      editedByIds: editedByIds ?? [],
     });
 
     return NextResponse.json(newMedia, { status: 200 });
