@@ -108,3 +108,72 @@ export function replaceGalleryImagesForMediaCoverage(
     }
   );
 }
+
+export function countGalleryImagesForMediaCoverage(
+  mediaCoverageId: EntityId
+): Promise<number> {
+  return runDataQuery(
+    `count gallery images for media coverage ${String(mediaCoverageId)}`,
+    () =>
+      getPrisma().mediaGalleryImage.count({
+        where: { mediaCoverageId: toBigIntId(mediaCoverageId) },
+      })
+  );
+}
+
+/** Highest existing sortOrder for a coverage, or -1 when the gallery is empty. */
+export function getMaxGallerySortOrder(
+  mediaCoverageId: EntityId
+): Promise<number> {
+  return runDataQuery(
+    `get max gallery sort order for media coverage ${String(mediaCoverageId)}`,
+    async () => {
+      const result = await getPrisma().mediaGalleryImage.aggregate({
+        where: { mediaCoverageId: toBigIntId(mediaCoverageId) },
+        _max: { sortOrder: true },
+      });
+      return result._max.sortOrder ?? -1;
+    }
+  );
+}
+
+/**
+ * Rewrites `sortOrder` to match `orderedIds` index-for-index inside one
+ * transaction. Each id must belong to the coverage — a mismatched or foreign id
+ * makes an `updateMany` touch 0 rows, which throws and rolls back the whole
+ * reorder. Returns the reloaded gallery in its new order.
+ */
+export function reorderGalleryImagesForMediaCoverage(
+  mediaCoverageId: EntityId,
+  orderedIds: EntityId[]
+): Promise<MediaGalleryImage[]> {
+  return runDataQuery(
+    `reorder gallery images for media coverage ${String(mediaCoverageId)}`,
+    async () => {
+      const prisma = getPrisma();
+      const parsedMediaCoverageId = toBigIntId(mediaCoverageId);
+
+      return prisma.$transaction(async (tx) => {
+        for (let index = 0; index < orderedIds.length; index += 1) {
+          const result = await tx.mediaGalleryImage.updateMany({
+            where: {
+              id: toBigIntId(orderedIds[index]),
+              mediaCoverageId: parsedMediaCoverageId,
+            },
+            data: { sortOrder: index },
+          });
+          if (result.count !== 1) {
+            throw new Error(
+              `Gallery image ${String(orderedIds[index])} does not belong to media coverage ${String(mediaCoverageId)}.`
+            );
+          }
+        }
+
+        return tx.mediaGalleryImage.findMany({
+          where: { mediaCoverageId: parsedMediaCoverageId },
+          orderBy: galleryOrderBy,
+        });
+      });
+    }
+  );
+}

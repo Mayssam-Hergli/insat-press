@@ -1,6 +1,6 @@
 import {
   ContentStatus,
-  type MediaCoverage,
+   type MediaCoverage,
   type Prisma,
 } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/db/prisma";
@@ -91,6 +91,22 @@ export function getMediaCoverageBySlug(
     })
   );
 }
+
+
+export function getPublishedMediaCoverageBySlug(
+  slug: string
+): Promise<MediaCoverageWithRelations | null> {
+  return runDataQuery(`get media coverage by slug ${slug}`, () =>
+    getPrisma().mediaCoverage.findUnique({
+      where: { 
+        slug,
+        status: ContentStatus.PUBLISHED,
+      },
+      include: mediaCoverageWithRelationsInclude,
+    })
+  );
+}
+
 
 export function getMediaCoverageByTitle(
   title: string

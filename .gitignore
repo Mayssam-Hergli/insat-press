@@ -48,6 +48,9 @@ next-env.d.ts
 .idea/
 .vscode/
 
+#claude
+.claude/
+
 # scratch notes / planning docs
 AUTH_FIX.md
 CONTEXT.md
