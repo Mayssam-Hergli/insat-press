@@ -1,10 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import type { GalleryImage } from "@/data/mediaCoverage";
+import MediaImage from "./MediaImage";
+
+export type MediaCarouselImage = {
+  id: string;
+  src: string | null;
+  alt: string | null;
+  label: string;
+  caption: string | null;
+};
 
 type MediaCarouselProps = {
-  images: GalleryImage[];
+  images: MediaCarouselImage[];
 };
 
 export default function MediaCarousel({ images }: MediaCarouselProps) {
@@ -15,33 +23,22 @@ export default function MediaCarousel({ images }: MediaCarouselProps) {
     return null;
   }
 
-  const activeImage = images[activeIndex];
+  const safeIndex = Math.min(activeIndex, images.length - 1);
+  const activeImage = images[safeIndex];
 
   const goPrevious = () => {
-    setActiveIndex((current) =>
-      current === 0 ? images.length - 1 : current - 1
-    );
+    setActiveIndex((current) => (current === 0 ? images.length - 1 : current - 1));
   };
 
   const goNext = () => {
-    setActiveIndex((current) =>
-      current === images.length - 1 ? 0 : current + 1
-    );
+    setActiveIndex((current) => (current === images.length - 1 ? 0 : current + 1));
   };
 
   const handleTouchEnd = (x: number) => {
     if (touchStart === null) return;
-
     const distance = touchStart - x;
-
-    if (distance > 50) {
-      goNext();
-    }
-
-    if (distance < -50) {
-      goPrevious();
-    }
-
+    if (distance > 50) goNext();
+    if (distance < -50) goPrevious();
     setTouchStart(null);
   };
 
@@ -54,7 +51,7 @@ export default function MediaCarousel({ images }: MediaCarouselProps) {
           </p>
 
           <p className="mt-2 text-base font-semibold text-[var(--ink)]">
-            {activeIndex + 1} / {images.length}
+            {safeIndex + 1} / {images.length}
           </p>
         </div>
 
@@ -78,22 +75,23 @@ export default function MediaCarousel({ images }: MediaCarouselProps) {
       </div>
 
       <div
-        className="flex h-[22rem] items-center justify-center rounded-[1.2rem] border border-[var(--line)] bg-[var(--sand)] md:h-[30rem]"
         onTouchStart={(event) => setTouchStart(event.touches[0].clientX)}
         onTouchEnd={(event) => handleTouchEnd(event.changedTouches[0].clientX)}
       >
-        {activeImage.src ? (
-          <img
-            src={activeImage.src}
-            alt={activeImage.alt ?? activeImage.label}
-            className="h-full w-full rounded-[1.2rem] object-cover"
-          />
-        ) : (
-          <span className="font-hand text-6xl font-bold text-[rgba(130,27,22,0.38)] md:text-7xl">
-            {activeImage.label}
-          </span>
-        )}
+        <MediaImage
+          path={activeImage.src}
+          alt={activeImage.alt ?? activeImage.label}
+          label={activeImage.label}
+          sizes="(min-width: 768px) 60vw, 100vw"
+          className="h-[22rem] w-full rounded-[1.2rem] md:h-[30rem]"
+        />
       </div>
+
+      {activeImage.caption && (
+        <p className="mt-3 text-base font-semibold text-[var(--ink)]">
+          {activeImage.caption}
+        </p>
+      )}
 
       <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
         {images.map((image, index) => (
@@ -102,7 +100,7 @@ export default function MediaCarousel({ images }: MediaCarouselProps) {
             type="button"
             onClick={() => setActiveIndex(index)}
             className={`h-16 min-w-24 rounded-xl border px-3 text-sm font-black transition ${
-              activeIndex === index
+              safeIndex === index
                 ? "border-[var(--press-red)] bg-[rgba(130,27,22,0.08)] text-[var(--press-red)]"
                 : "border-[var(--line)] bg-[rgba(255,248,243,0.28)] text-[var(--muted)]"
             }`}

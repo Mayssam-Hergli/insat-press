@@ -7,6 +7,15 @@ import MarkdownEditor from "./MarkdownEditor";
 import { dateTimeLocalToISO } from "@/lib/admin/datetime";
 import StatusSelect from "./StatusSelect";
 import ContributorSelect from "./ContributorSelect";
+import CoverImagePicker from "./CoverImagePicker";
+import MediaGalleryUploadStager, {
+  type StagedGalleryItem,
+} from "./MediaGalleryUploadStager";
+import {
+  MEDIA_IMAGE_ACCEPT,
+  getMediaImageUrl,
+  validateMediaImageFile,
+} from "@/lib/storage/media-images";
 
 export default function MediaAddForm({
   profiles,
@@ -18,6 +27,9 @@ export default function MediaAddForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [stagedGallery, setStagedGallery] = useState<StagedGalleryItem[]>([]);
   const [coveredByIds, setCoveredByIds] = useState<string[]>([]);
   const [editedByIds, setEditedByIds] = useState<string[]>([]);
 
@@ -27,7 +39,6 @@ export default function MediaAddForm({
     type: "",
     eventName: "",
     description: "",
-    coverImage: "",
     coverLabel: "",
     displayDate: "",
     coveredAt: "",
@@ -41,20 +52,80 @@ export default function MediaAddForm({
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/admin/media`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          coveredAt: dateTimeLocalToISO(formData.coveredAt),
-          coveredByIds,
-          editedByIds,
-        }),
-      });
+      const fields = {
+        ...formData,
+        status: undefined,
+        coveredAt: dateTimeLocalToISO(formData.coveredAt),
+        coveredByIds,
+        editedByIds,
+      };
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to add media coverage");
+      // 1. Create the draft (first attempt) or update it (a retry re-uses the
+      //    same id, so a mid-submit failure never creates a duplicate record).
+      let id = draftId;
+      if (!id) {
+        const response = await fetch(`/api/admin/media`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(fields),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Failed to create the draft");
+        id = String(data.id);
+        setDraftId(id);
+      } else {
+        const response = await fetch(`/api/admin/media/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(fields),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Failed to update the draft");
+      }
+
+      // 2. Cover upload; clear on success so a retry skips it.
+      if (coverFile) {
+        const upload = new FormData();
+        upload.set("file", coverFile);
+        const response = await fetch(`/api/admin/media/${id}/cover`, {
+          method: "POST",
+          body: upload,
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(`${data.error || "Cover upload failed."} The draft was kept; retry to continue.`);
+        }
+        setCoverFile(null);
+      }
+
+      // 3. Gallery uploads, in order. Each removes itself from the staged list on
+      //    success so a retry resumes with only the images that still remain.
+      const pending = [...stagedGallery];
+      for (const item of pending) {
+        const body = new FormData();
+        body.set("file", item.file);
+        if (item.alt) body.set("alt", item.alt);
+        if (item.caption) body.set("caption", item.caption);
+        const response = await fetch(`/api/admin/media/${id}/gallery`, {
+          method: "POST",
+          body,
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(`${data.error || "Gallery upload failed."} Draft saved; retry to upload the remaining images.`);
+        }
+        setStagedGallery((prev) => prev.filter((it) => it.key !== item.key));
+      }
+
+      // 4. Apply the requested status (resolveWriteStatus runs server-side).
+      const transition = await fetch(`/api/admin/media/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: formData.status }),
+      });
+      const transitionData = await transition.json().catch(() => ({}));
+      if (!transition.ok) {
+        throw new Error(`${transitionData.error || "Status update failed."} The draft was kept; retry to continue.`);
       }
 
       router.push("/admin/media");
@@ -183,20 +254,15 @@ export default function MediaAddForm({
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="coverImage" className="admin-label">
-              Cover Image URL
-            </label>
-            <input
-              type="url"
-              id="coverImage"
-              value={formData.coverImage}
-              onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-              className="admin-input"
-            />
-          </div>
-
+        <div className="grid gap-4 md:grid-cols-2">
+          <CoverImagePicker
+            file={coverFile}
+            onFileChange={setCoverFile}
+            resolveUrl={getMediaImageUrl}
+            validate={validateMediaImageFile}
+            accept={MEDIA_IMAGE_ACCEPT}
+            previewAlt="Media cover preview"
+          />
           <div>
             <label htmlFor="coverLabel" className="admin-label">
               Cover Label
@@ -240,6 +306,9 @@ export default function MediaAddForm({
             />
           </div>
         </div>
+
+        {/* Gallery staging — uploaded after the draft is created. */}
+        <MediaGalleryUploadStager items={stagedGallery} onChange={setStagedGallery} />
 
         {/* Content */}
         <div>

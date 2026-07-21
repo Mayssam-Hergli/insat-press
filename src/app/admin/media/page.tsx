@@ -1,5 +1,6 @@
 import { getAllMediaCoverage } from "@/lib/data/mediaCoverage";
 import StatusBadge from "@/components/admin/StatusBadge";
+import DeleteMediaButton from "@/components/admin/DeleteMediaButton";
 import { requireAuth } from "@/lib/auth/session";
 import { canAccessSection, isAdmin } from "@/lib/auth/permissions";
 import Link from "next/link";
@@ -81,6 +82,11 @@ export default async function AdminMediaPage() {
                   >
                     View
                   </Link>
+                  {isAdmin(profile.role) && (
+                    <span className="ml-4">
+                      <DeleteMediaButton id={media.id.toString()} />
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}

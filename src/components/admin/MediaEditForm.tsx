@@ -8,6 +8,13 @@ import MarkdownEditor, { toMarkdownString } from "./MarkdownEditor";
 import { toDateTimeLocalValue, dateTimeLocalToISO } from "@/lib/admin/datetime";
 import StatusSelect from "./StatusSelect";
 import ContributorSelect from "./ContributorSelect";
+import CoverImagePicker from "./CoverImagePicker";
+import MediaGalleryManager, { type GalleryImageData } from "./MediaGalleryManager";
+import {
+  MEDIA_IMAGE_ACCEPT,
+  getMediaImageUrl,
+  validateMediaImageFile,
+} from "@/lib/storage/media-images";
 
 type MediaEditFormProps = {
   media: MediaCoverageWithRelations;
@@ -19,6 +26,8 @@ export default function MediaEditForm({ media, profiles, canPublish }: MediaEdit
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [removeCover, setRemoveCover] = useState(false);
   const [coveredByIds, setCoveredByIds] = useState<string[]>(
     media.contributors.filter((c) => c.role === "COVERED_BY").map((c) => c.profileId)
   );
@@ -32,7 +41,6 @@ export default function MediaEditForm({ media, profiles, canPublish }: MediaEdit
     type: media.type,
     eventName: media.eventName,
     description: media.description,
-    coverImage: media.coverImage || "",
     coverLabel: media.coverLabel || "",
     displayDate: media.displayDate || "",
     coveredAt: toDateTimeLocalValue(media.coveredAt),
@@ -40,26 +48,68 @@ export default function MediaEditForm({ media, profiles, canPublish }: MediaEdit
     content: toMarkdownString(media.content),
   });
 
+  const initialImages: GalleryImageData[] = media.gallery.map((image) => ({
+    id: image.id.toString(),
+    src: image.src,
+    alt: image.alt,
+    label: image.label,
+    caption: image.caption,
+    sortOrder: image.sortOrder,
+  }));
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
+      // 1. Save the scalar fields. Status flips in a separate PATCH so cover
+      //    changes never race the status transition (mirrors the article form).
       const response = await fetch(`/api/admin/media/${media.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          status: undefined,
           coveredAt: dateTimeLocalToISO(formData.coveredAt),
           coveredByIds,
           editedByIds,
         }),
       });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Failed to update media coverage");
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to update media coverage");
+      // 2. Cover upload or removal.
+      if (coverFile) {
+        const upload = new FormData();
+        upload.set("file", coverFile);
+        const coverResponse = await fetch(`/api/admin/media/${media.id}/cover`, {
+          method: "POST",
+          body: upload,
+        });
+        const coverData = await coverResponse.json().catch(() => ({}));
+        if (!coverResponse.ok) {
+          throw new Error(coverData.error || "Cover upload failed; the text changes were saved.");
+        }
+      } else if (removeCover) {
+        const coverResponse = await fetch(`/api/admin/media/${media.id}/cover`, {
+          method: "DELETE",
+        });
+        const coverData = await coverResponse.json().catch(() => ({}));
+        if (!coverResponse.ok && !coverData.removed) {
+          throw new Error(coverData.error || "Cover removal was only partially completed.");
+        }
+      }
+
+      // 3. Status transition.
+      const transition = await fetch(`/api/admin/media/${media.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: formData.status }),
+      });
+      const transitionData = await transition.json().catch(() => ({}));
+      if (!transition.ok) {
+        throw new Error(transitionData.error || "Content was saved, but the status could not be updated.");
       }
 
       router.push("/admin/media");
@@ -188,20 +238,18 @@ export default function MediaEditForm({ media, profiles, canPublish }: MediaEdit
         </div>
 
         {/* Cover Image and Label */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="coverImage" className="admin-label">
-              Cover Image URL
-            </label>
-            <input
-              type="url"
-              id="coverImage"
-              value={formData.coverImage}
-              onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-              className="admin-input"
-            />
-          </div>
-
+        <div className="grid gap-4 md:grid-cols-2">
+          <CoverImagePicker
+            currentPath={media.coverImage}
+            file={coverFile}
+            removeCurrent={removeCover}
+            onFileChange={setCoverFile}
+            onRemoveCurrentChange={setRemoveCover}
+            resolveUrl={getMediaImageUrl}
+            validate={validateMediaImageFile}
+            accept={MEDIA_IMAGE_ACCEPT}
+            previewAlt="Media cover preview"
+          />
           <div>
             <label htmlFor="coverLabel" className="admin-label">
               Cover Label
@@ -246,19 +294,8 @@ export default function MediaEditForm({ media, profiles, canPublish }: MediaEdit
           </div>
         </div>
 
-        {/* Gallery */}
-        <div>
-          <label className="admin-label">
-            Gallery
-          </label>
-          <div className="text-sm text-[var(--muted)]">
-            Current images:{" "}
-            {media.gallery.map((image) => image.label).join(", ") || "None"}
-          </div>
-          <p className="mt-1 text-xs text-[var(--muted)]">
-            Note: Gallery management will be implemented in a future update
-          </p>
-        </div>
+        {/* Gallery — actions here persist immediately, outside the form submit. */}
+        <MediaGalleryManager mediaId={media.id.toString()} initialImages={initialImages} />
 
         {/* Content */}
         <div>
