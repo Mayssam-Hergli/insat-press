@@ -51,11 +51,11 @@ export default function WritingBrowser({ articles }: { articles: WritingArticle[
 
   return (
     <div>
-      <div className="paper-card mb-8 rounded-[1.2rem] p-4 md:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="paper-card mb-6 rounded-[1.2rem] p-3 md:p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="relative min-w-0 flex-1">
             <label htmlFor="writing-search" className="sr-only">Search articles</label>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted)]">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]">
               <circle cx="11" cy="11" r="7" />
               <path d="m20 20-4-4" />
             </svg>
@@ -66,7 +66,7 @@ export default function WritingBrowser({ articles }: { articles: WritingArticle[
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={(event) => { if (event.key === "Escape") setQuery(""); }}
               placeholder="Search stories, topics, or authors…"
-              className="h-12 w-full appearance-none rounded-full border border-[var(--line)] bg-[rgba(255,248,243,0.72)] py-2 pl-12 pr-12 text-base text-[var(--ink)] outline-none transition placeholder:text-[var(--muted)] placeholder:opacity-70 focus:border-[var(--press-red)] focus:bg-[var(--cream)] focus:ring-3 focus:ring-[rgba(130,27,22,0.15)]"
+              className="h-10 w-full appearance-none rounded-full border border-[var(--line)] bg-[rgba(255,248,243,0.72)] py-1.5 pl-10 pr-10 text-sm text-[var(--ink)] outline-none transition placeholder:text-[var(--muted)] placeholder:opacity-70 focus:border-[var(--press-red)] focus:bg-[var(--cream)] focus:ring-3 focus:ring-[rgba(130,27,22,0.15)]"
             />
             {query && (
               <button type="button" aria-label="Clear search" onClick={() => setQuery("")} className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-xl leading-none text-[var(--muted)] transition hover:bg-[rgba(130,27,22,0.08)] hover:text-[var(--press-red)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--press-red)]">
@@ -77,9 +77,9 @@ export default function WritingBrowser({ articles }: { articles: WritingArticle[
           {hasFilters && <button type="button" onClick={clearFilters} className="shrink-0 self-end text-xs font-black uppercase tracking-[0.12em] text-[var(--press-red)] underline underline-offset-4 sm:self-auto">Reset</button>}
         </div>
 
-        <div className="hide-scrollbar mt-4 flex gap-2 overflow-x-auto border-t border-[var(--line)] pt-4 pb-1">
+        <div className="hide-scrollbar mt-3 flex gap-2 overflow-x-auto border-t border-[var(--line)] pt-3">
           {categories.map((item) => (
-            <button key={item} type="button" onClick={() => setCategory(item)} aria-pressed={category === item} className={`whitespace-nowrap rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.12em] transition ${category === item ? "border-[var(--press-red)] bg-[var(--press-red)] text-[var(--cream)]" : "border-[var(--line)] text-[var(--muted)] hover:border-[var(--press-red)] hover:text-[var(--press-red)]"}`}>
+            <button key={item} type="button" onClick={() => setCategory(item)} aria-pressed={category === item} className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-[0.7rem] font-black uppercase tracking-[0.12em] transition ${category === item ? "border-[var(--press-red)] bg-[var(--press-red)] text-[var(--cream)]" : "border-[var(--line)] text-[var(--muted)] hover:border-[var(--press-red)] hover:text-[var(--press-red)]"}`}>
               {item}
             </button>
           ))}

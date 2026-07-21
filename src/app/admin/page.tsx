@@ -7,6 +7,7 @@ import { requireAuth } from "@/lib/auth/session";
 import { isAdmin, sectionsForRole } from "@/lib/auth/permissions";
 import StatusBadge from "@/components/admin/StatusBadge";
 import ApprovalActions from "@/components/admin/ApprovalActions";
+import WriterDashboard from "@/components/admin/WriterDashboard";
 import Link from "next/link";
 
 async function getPendingApprovals() {
@@ -114,7 +115,12 @@ function StatCard({
 export default async function AdminDashboard() {
   const profile = await requireAuth();
 
-  // Writers and media staff get a focused view of their own submissions.
+  // The same /admin route becomes a purpose-built dashboard for each role.
+  if (profile.role === "WRITER") {
+    return <WriterDashboard profile={profile} />;
+  }
+
+  // Media staff keep a focused view of their own submissions.
   if (!isAdmin(profile.role)) {
     return <ContributorDashboard profile={profile} />;
   }

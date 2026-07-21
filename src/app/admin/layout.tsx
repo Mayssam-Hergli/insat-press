@@ -9,6 +9,12 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const profile = await requireAuth();
+  const workspaceLabel =
+    profile.role === "ADMIN"
+      ? "admin"
+      : profile.role === "WRITER"
+        ? "writers' room"
+        : "media desk";
 
   return (
     <div className="min-h-screen page-bg">
@@ -25,7 +31,7 @@ export default async function AdminLayout({
                   insat <span className="text-[var(--press-red)]">press</span>
                 </span>
                 <span className="font-hand text-lg text-[var(--press-red)]">
-                  admin
+                  {workspaceLabel}
                 </span>
               </Link>
               <AdminNav role={profile.role} />

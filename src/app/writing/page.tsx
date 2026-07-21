@@ -23,11 +23,11 @@ export default async function WritingPage() {
     <main className="min-h-screen page-bg">
       <Navbar />
 
-      <section className="px-6 py-10 md:px-12 lg:px-20">
+      <section className="px-6 py-7 md:px-12 md:py-8 lg:px-20">
         <div className="mx-auto max-w-6xl">
-          <PageTitle title="Writing Department" />
+          <PageTitle title="Writing Department" compact />
 
-          <p className="mb-8 max-w-2xl text-lg leading-8 text-[var(--muted)]">Ideas, investigations, and perspectives from the INSAT community.</p>
+    
           <WritingBrowser articles={browserArticles} />
         </div>
       </section>
