@@ -447,3 +447,61 @@ a {
   font-weight: 700;
   color: var(--ink);
 }
+
+/* Long-form editorial typography for public articles */
+.article-body {
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.75;
+  letter-spacing: -0.012em;
+}
+
+.article-body p {
+  margin-bottom: 1.45em;
+}
+
+.article-body h1,
+.article-body h2,
+.article-body h3 {
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  letter-spacing: -0.025em;
+}
+
+.article-body h2 {
+  margin-top: 2.2em;
+  padding-top: 0.75em;
+  border-top: 1px solid var(--line);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.article-body h3 {
+  font-size: 1.45rem;
+}
+
+.article-body blockquote {
+  margin: 2.2em 0;
+  padding: 0.2em 0 0.2em 1.2em;
+  border-left-width: 4px;
+  font-size: 1.35rem;
+  line-height: 1.55;
+}
+
+.article-body img {
+  margin: 2.5em 0;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: 0 16px 40px rgba(33, 25, 22, 0.1);
+}
+
+.article-body a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+@media (min-width: 768px) {
+  .article-body {
+    font-size: 1.38rem;
+    line-height: 1.72;
+  }
+}

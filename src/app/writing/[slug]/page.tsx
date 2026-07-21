@@ -12,22 +12,64 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   const writers = article.writers.map(({ profile }) => profile.fullName ?? profile.email).join(", ") || "INSAT Press";
   const date = article.displayDate ?? article.publishedAt?.toLocaleDateString("en", { year: "numeric", month: "long", day: "numeric" }) ?? "";
+  const wordCount = typeof article.content === "string"
+    ? article.content.trim().split(/\s+/).filter(Boolean).length
+    : 0;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 220));
 
   return (
     <main className="min-h-screen page-bg">
       <Navbar />
-      <article className="px-6 py-10 md:px-12 lg:px-20">
-        <div className="mx-auto max-w-6xl">
-          <Link href="/writing" className="text-sm font-black uppercase tracking-[0.18em] text-[var(--press-red)]">← Back to Writing</Link>
-          <section className="mt-8 grid gap-6 rounded-[1.2rem] border border-[var(--line)] bg-[rgba(255,248,243,0.28)] p-6 md:grid-cols-[1.1fr_0.9fr] md:p-8">
-            <div>
-              <p className="text-sm font-bold text-[var(--muted)]"><span className="text-[var(--press-red)]">{article.category}</span> · {writers}{date && ` · ${date}`}</p>
-              <h1 className="font-serif-display mt-4 text-5xl font-bold leading-[1.05] text-[var(--press-red)] md:text-6xl">{article.title}</h1>
-              <p className="mt-5 max-w-3xl text-lg font-semibold leading-8 text-[var(--ink)]">{article.description}</p>
+      <article>
+        <header className="px-5 pb-7 pt-8 md:px-10 md:pb-9 md:pt-10">
+          <div className="mx-auto max-w-5xl">
+            <Link href="/writing" className="group inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[var(--muted)] transition-colors hover:text-[var(--press-red)]">
+              <span className="transition-transform group-hover:-translate-x-1">←</span> Writing department
+            </Link>
+
+            <div className="mt-8">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-black uppercase tracking-[0.16em]">
+                <span className="rounded-md bg-[var(--press-red)] px-2.5 py-1.5 text-[var(--cream)]">{article.category}</span>
+                <span className="text-[var(--muted)]">{readingTime} min read</span>
+              </div>
+              <h1 className="mt-5 max-w-4xl text-balance text-[clamp(2.35rem,5vw,4.5rem)] font-black leading-[1.06] tracking-[-0.04em] text-[var(--ink)]">
+                {article.title}
+              </h1>
+              <p className="mt-5 max-w-3xl text-lg font-medium leading-8 text-[var(--muted)] md:text-xl">
+                {article.description}
+              </p>
+              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
+                <p><span className="text-[var(--muted)]">By</span> <strong className="text-[var(--ink)]">{writers}</strong></p>
+                {date && <p className="text-[var(--muted)]">{date}</p>}
+              </div>
             </div>
-            <ArticleCoverImage path={article.coverImage} alt={`${article.title} cover`} label={article.coverLabel} className="min-h-64 rounded-[1.2rem]" sizes="(max-width: 768px) 100vw, 40vw" priority />
-          </section>
-          <section className="mx-auto mt-10 max-w-3xl"><ArticleContent content={article.content} /></section>
+          </div>
+        </header>
+
+        <div className="mx-auto max-w-5xl px-5 pb-12 md:px-10 md:pb-16">
+          <figure>
+            <ArticleCoverImage
+              path={article.coverImage}
+              alt={`${article.title} cover`}
+              label={article.coverLabel}
+              className="aspect-[16/9] w-full rounded-lg"
+              sizes="(max-width: 1100px) 100vw, 1024px"
+              priority
+            />
+            {article.coverLabel && <figcaption className="mt-2 text-right text-xs font-semibold italic text-[var(--muted)]">{article.coverLabel}</figcaption>}
+          </figure>
+
+          <div className="mx-auto mt-9 max-w-4xl md:mt-12">
+          {article.sourceUrl && (
+            <a href={article.sourceUrl} target="_blank" rel="noreferrer" className="mb-7 inline-block text-xs font-black uppercase tracking-[0.14em] text-[var(--press-red)] underline underline-offset-4">View original source ↗</a>
+          )}
+          <section><ArticleContent content={article.content} /></section>
+
+          <footer className="mt-14 border-y border-[var(--line)] py-8 text-center md:mt-20">
+            <p className="font-hand text-3xl font-bold text-[var(--press-red)]">Keep reading.</p>
+            <Link href="/writing" className="btn-editorial mt-4">Explore more stories →</Link>
+          </footer>
+          </div>
         </div>
       </article>
     </main>

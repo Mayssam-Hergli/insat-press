@@ -10,7 +10,7 @@ function toMarkdownString(value: unknown): string {
 
 export default function ArticleContent({ content }: { content: unknown }) {
   return (
-    <div className="prose prose-lg max-w-none text-[var(--ink)]">
+    <div className="markdown-preview article-body max-w-none text-[var(--ink)]">
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{toMarkdownString(content)}</ReactMarkdown>
     </div>
   );

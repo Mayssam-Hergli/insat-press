@@ -10,7 +10,7 @@ function supabaseStoragePattern() {
       protocol: "https" as const,
       hostname: url.hostname,
       port: "",
-      pathname: "/storage/v1/object/public/article-images/**",
+      pathname: "/storage/v1/object/public/articles-photos/**",
       search: "",
     }];
   } catch {

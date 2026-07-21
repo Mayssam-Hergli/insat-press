@@ -1,10 +1,23 @@
 import Navbar from "@/components/shared/Navbar";
 import PageTitle from "@/components/shared/PageTitle";
-import ArticleCard from "@/components/cards/ArticleCard";
+import WritingBrowser from "@/components/writing/WritingBrowser";
 import { getPublishedArticles } from "@/lib/data/articles";
 
 export default async function WritingPage() {
   const articles = await getPublishedArticles();
+  const browserArticles = articles.map((article) => ({
+    slug: article.slug,
+    title: article.title,
+    description: article.description,
+    category: article.category,
+    coverImage: article.coverImage,
+    coverLabel: article.coverLabel,
+    displayDate: article.displayDate,
+    publishedAt: article.publishedAt?.toISOString() ?? null,
+    writers: article.writers.map(({ profile }) => ({
+      name: profile.fullName ?? profile.email,
+    })),
+  }));
 
   return (
     <main className="min-h-screen page-bg">
@@ -14,11 +27,8 @@ export default async function WritingPage() {
         <div className="mx-auto max-w-6xl">
           <PageTitle title="Writing Department" />
 
-          <div className="overflow-hidden rounded-[1.2rem] border border-[var(--line)] bg-[rgba(255,248,243,0.28)]">
-            {articles.map((article) => (
-              <ArticleCard key={article.slug} article={article} />
-            ))}
-          </div>
+          <p className="mb-8 max-w-2xl text-lg leading-8 text-[var(--muted)]">Ideas, investigations, and perspectives from the INSAT community.</p>
+          <WritingBrowser articles={browserArticles} />
         </div>
       </section>
     </main>

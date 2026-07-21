@@ -1,4 +1,4 @@
-export const ARTICLE_IMAGE_BUCKET = "article-images";
+export const ARTICLE_IMAGE_BUCKET = "articles-photos";
 export const ARTICLE_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export const ARTICLE_IMAGE_MAX_WIDTH = 1600;
 export const ARTICLE_IMAGE_ACCEPT = "image/jpeg,image/png,image/webp";
