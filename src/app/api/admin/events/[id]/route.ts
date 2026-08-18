@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/session";
 import { isAdmin } from "@/lib/auth/permissions";
-import { updateEvent, getEventById } from "@/lib/data/events";
+import { deleteEvent, updateEvent, getEventById } from "@/lib/data/events";
 
 export async function PATCH(
   request: NextRequest,
@@ -58,12 +58,13 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Note: Actual deletion would require canDelete permission
-    // For now, this is a placeholder
-    return NextResponse.json(
-      { error: "Delete functionality not yet implemented" },
-      { status: 501 }
-    );
+    const event = await getEventById(id);
+    if (!event) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    await deleteEvent(id);
+    return NextResponse.json({ deleted: true });
   } catch (error) {
     console.error("Delete event error:", error);
     return NextResponse.json(

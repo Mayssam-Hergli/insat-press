@@ -1,5 +1,6 @@
 import { getAllEvents } from "@/lib/data/events";
 import StatusBadge from "@/components/admin/StatusBadge";
+import DeleteEventButton from "@/components/admin/DeleteEventButton";
 import { requireRole } from "@/lib/auth/session";
 import Link from "next/link";
 
@@ -68,10 +69,11 @@ export default async function AdminEventsPage() {
                   </Link>
                   <Link
                     href={`/events/${event.slug}`}
-                    className="text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+                    className="mr-4 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
                   >
                     View
                   </Link>
+                  <DeleteEventButton id={event.id.toString()} />
                 </td>
               </tr>
             ))}

@@ -1,5 +1,6 @@
 import { getAllPodcastEpisodes } from "@/lib/data/podcastEpisodes";
 import StatusBadge from "@/components/admin/StatusBadge";
+import DeletePodcastButton from "@/components/admin/DeletePodcastButton";
 import { requireRole } from "@/lib/auth/session";
 import Link from "next/link";
 
@@ -68,10 +69,11 @@ export default async function AdminPodcastPage() {
                   </Link>
                   <Link
                     href={`/podcast/${episode.slug}`}
-                    className="text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+                    className="mr-4 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
                   >
                     View
                   </Link>
+                  <DeletePodcastButton id={episode.id.toString()} />
                 </td>
               </tr>
             ))}
