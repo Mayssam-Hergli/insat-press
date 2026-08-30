@@ -1,6 +1,7 @@
 import Link from "next/link";
 import FloatingLetters from "@/components/FloatingLetters";
 import Navbar from "@/components/shared/Navbar";
+import { getPublishedArticles } from "@/lib/data/articles";
 
 const sections = [
   {
@@ -33,25 +34,14 @@ const sections = [
   },
 ];
 
-const articles = [
-  {
-    title: "The Voice Behind the Words",
-    category: "Editorial",
-    href: "/writing/voice-behind-the-words",
-  },
-  {
-    title: "Campus Stories",
-    category: "Campus Life",
-    href: "/writing/campus-stories",
-  },
-  {
-    title: "Between Ink and Campus",
-    category: "Creative Writing",
-    href: "/writing/between-ink-and-campus",
-  },
-];
+export default async function Home() {
+  const publishedArticles = await getPublishedArticles({ take: 3 });
+  const articles = publishedArticles.map((article) => ({
+    title: article.title,
+    category: article.category,
+    href: `/writing/${article.slug}`,
+  }));
 
-export default function Home() {
   return (
     <main className="min-h-screen page-bg">
       <Navbar />
