@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +40,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# IDE / editor
+.idea/
+.vscode/
+
+# scratch notes / planning docs
+AUTH_FIX.md
+CONTEXT.md
+QUICK_START_ADMIN.md
+SETUP.md
+next_tasks_admin_writer.tex

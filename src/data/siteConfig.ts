@@ -12,11 +12,11 @@ export const siteConfig = {
   ],
 
   socialLinks: [
-    { label: "Facebook", href: "#" },
-    { label: "Instagram", href: "#" },
-    { label: "LinkedIn", href: "#" },
-    { label: "YouTube", href: "#" },
-    { label: "Spotify", href: "#" },
+    { label: "Facebook", href: "https://www.facebook.com/Insat.Press" },
+    { label: "Instagram", href: "https://www.instagram.com/insat_press" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/company/insat-press-1/posts/?feedView=all" },
+    { label: "YouTube", href: "https://www.youtube.com/@INSATPRESS" },
+    { label: "Spotify", href: "https://open.spotify.com/show/2BqrgaQ0lpLrixtRtuyGI3?si=7bcd7c314b6747b6" },
   ],
 
   recruitment: {

@@ -25,6 +25,7 @@ const board = [
 const webmasters = [
   { name: "Mayssam Hergli", initials: "MH", photo: "/webmasters/mayssam-hergli.jpeg" },
   { name: "Israa Soudani", initials: "IS", photo: "/webmasters/israa-soudani.jpeg" },
+  { name: "Moataz Zouari", initials: "MZ", photo: "/webmasters/taz.jpg" },
 ];
 
 export default function AboutPage() {
@@ -140,7 +141,7 @@ export default function AboutPage() {
               Website made and mastered by
             </h2>
 
-            <div className="mx-auto mt-7 grid max-w-2xl gap-4 sm:grid-cols-2">
+            <div className="mx-auto mt-7 grid max-w-3xl gap-4 sm:grid-cols-3">
               {webmasters.map((webmaster) => (
                 <article
                   key={webmaster.name}
