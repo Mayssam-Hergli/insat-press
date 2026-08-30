@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/shared/Navbar";
-import { mediaCoverage } from "@/data/mediaCoverage";
+import MediaCoverageContent from "@/components/media/MediaCoverageContent";
+import MediaImage from "@/components/media/MediaImage";
+import MediaCarousel from "@/components/media/MediaCarousel";
+import { getPublishedMediaCoverageBySlug } from "@/lib/data/mediaCoverage";
 
 type MediaDetailsPageProps = {
   params: Promise<{
@@ -9,22 +12,33 @@ type MediaDetailsPageProps = {
   }>;
 };
 
-export function generateStaticParams() {
-  return mediaCoverage.map((item) => ({
-    slug: item.slug,
-  }));
-}
 
 export default async function MediaDetailsPage({
   params,
 }: MediaDetailsPageProps) {
   const { slug } = await params;
 
-  const item = mediaCoverage.find((coverage) => coverage.slug === slug);
+  const item = await getPublishedMediaCoverageBySlug(slug);
 
   if (!item) {
     notFound();
   }
+
+  const displayDate =
+    item.displayDate ??
+    item.publishedAt?.toLocaleDateString("en", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+
+  const galleryImages = item.gallery.map((image) => ({
+    id: image.id.toString(),
+    src: image.src,
+    alt: image.alt,
+    label: image.label,
+    caption: image.caption,
+  }));
 
   return (
     <main className="min-h-screen page-bg">
@@ -44,7 +58,7 @@ export default async function MediaDetailsPage({
             <div>
               <p className="text-sm font-bold text-[var(--muted)]">
                 <span className="text-[var(--press-red)]">{item.type}</span> ·{" "}
-                {item.eventName} · {item.date}
+                {item.eventName} · {displayDate}
               </p>
 
               <h1 className="font-serif-display mt-4 text-5xl font-bold leading-[1.05] text-[var(--press-red)] md:text-6xl">
@@ -56,62 +70,21 @@ export default async function MediaDetailsPage({
               </p>
             </div>
 
-            <div className="flex min-h-64 items-center justify-center rounded-[1.2rem] border border-[var(--line)] bg-[var(--sand)]">
-              {item.coverImage ? (
-                <img
-                  src={item.coverImage}
-                  alt={item.title}
-                  className="h-full w-full rounded-[1.2rem] object-cover"
-                />
-              ) : (
-                <span className="font-hand text-6xl font-bold text-[rgba(130,27,22,0.38)]">
-                  {item.coverLabel}
-                </span>
-              )}
-            </div>
+            <MediaImage
+              path={item.coverImage}
+              alt={item.title}
+              label={item.coverLabel ?? item.title}
+              priority
+              sizes="(min-width: 768px) 45vw, 100vw"
+              className="min-h-64 rounded-[1.2rem]"
+            />
           </section>
 
-          <section className="mx-auto mt-10 max-w-3xl space-y-6 text-lg leading-9 text-[var(--ink)]">
-            {item.content.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
+          <section className="mx-auto mt-10 max-w-3xl">
+            <MediaCoverageContent content={item.content} />
           </section>
 
-          <section className="mt-12 rounded-[1.2rem] border border-[var(--line)] bg-[rgba(255,248,243,0.28)] p-5 md:p-7">
-            <div className="mb-5">
-              <p className="font-hand text-5xl font-bold leading-none text-[var(--press-red)]">
-                Gallery
-              </p>
-
-              <p className="mt-2 text-base font-semibold text-[var(--ink)]">
-                Swipe or scroll through {item.gallery.length} photos
-              </p>
-            </div>
-            <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {item.gallery.map((image, index) => (
-                <div
-                  key={image.id}
-                  className="relative flex h-[24rem] min-w-full snap-center items-center justify-center rounded-[1.2rem] border border-[var(--line)] bg-[var(--sand)] md:h-[32rem]"
-                >
-                  {image.src ? (
-                    <img
-                      src={image.src}
-                      alt={image.alt ?? image.label}
-                      className="h-full w-full rounded-[1.2rem] object-cover"
-                    />
-                  ) : (
-                    <span className="font-hand text-6xl font-bold text-[rgba(130,27,22,0.38)] md:text-7xl">
-                      {image.label}
-                    </span>
-                  )}
-
-                  <div className="absolute bottom-4 right-4 rounded-full border border-[var(--line)] bg-[rgba(255,248,243,0.72)] px-4 py-2 text-sm font-black text-[var(--press-red)] backdrop-blur">
-                    {index + 1} / {item.gallery.length}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+          {galleryImages.length > 0 && <MediaCarousel images={galleryImages} />}
         </div>
       </article>
     </main>

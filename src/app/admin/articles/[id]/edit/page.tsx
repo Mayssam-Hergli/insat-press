@@ -1,33 +1,45 @@
 import { getArticleById } from "@/lib/data/articles";
-import { getAllWriters } from "@/lib/data/writers";
-import { notFound } from "next/navigation";
+import { getAllProfiles } from "@/lib/data/profiles";
+import { notFound, redirect } from "next/navigation";
 import ArticleEditForm from "@/components/admin/ArticleEditForm";
+import { requireAuth } from "@/lib/auth/session";
+import { canEditArticle, canPublish } from "@/lib/auth/permissions";
 
 export default async function EditArticlePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const profile = await requireAuth();
   const { id } = await params;
-  const [article, writers] = await Promise.all([
+  const [article, profiles] = await Promise.all([
     getArticleById(id),
-    getAllWriters(),
+    getAllProfiles(),
   ]);
 
   if (!article) {
     notFound();
   }
 
+  // Writers may only edit their own articles.
+  if (!canEditArticle(profile.role, article, profile.id)) {
+    redirect("/admin/articles");
+  }
+
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Edit Article</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="font-serif-display text-3xl font-bold text-[var(--ink)]">Edit Article</h1>
+        <p className="mt-1 text-[var(--muted)]">
           Update the article information and content below.
         </p>
       </div>
 
-      <ArticleEditForm article={article} writers={writers} />
+      <ArticleEditForm
+        article={article}
+        profiles={profiles}
+        canPublish={canPublish(profile.role)}
+      />
     </div>
   );
 }

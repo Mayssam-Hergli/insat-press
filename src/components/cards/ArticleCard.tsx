@@ -1,12 +1,16 @@
-import type { ArticleWithWriters } from "@/lib/data/articles";
+import type { ArticleWithContributors } from "@/lib/data/articles";
+import ArticleCoverImage from "@/components/articles/ArticleCoverImage";
 
 type ArticleCardProps = {
-  article: ArticleWithWriters;
+  article: ArticleWithContributors;
 };
 
 export default function ArticleCard({ article }: ArticleCardProps) {
   const writerNames = article.writers
-    .map((articleWriter) => articleWriter.writer.name)
+    .map(
+      (articleWriter) =>
+        articleWriter.profile.fullName ?? articleWriter.profile.email
+    )
     .join(", ");
   const displayWriter = writerNames || "INSAT Press";
   const displayDate =
@@ -46,12 +50,13 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           </p>
         </div>
 
-        <div className="hidden h-20 w-32 shrink-0 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--sand)] md:flex">
-          <span className="font-hand text-3xl font-bold text-[rgba(130,27,22,0.38)]">
-            {// todo : should be img src= article.coverImage not label
-            article.coverLabel}
-          </span>
-        </div>
+        <ArticleCoverImage
+          path={article.coverImage}
+          alt={`${article.title} cover`}
+          label={article.coverLabel}
+          className="hidden h-20 w-32 shrink-0 rounded-xl md:block"
+          sizes="128px"
+        />
       </article>
     </a>
   );

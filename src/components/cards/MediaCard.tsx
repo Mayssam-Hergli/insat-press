@@ -1,10 +1,20 @@
-import type { MediaCoverage } from "@/data/mediaCoverage";
+import type { MediaCoverageWithRelations } from "@/lib/data/mediaCoverage";
 
 type MediaCardProps = {
-  item: MediaCoverage;
+  item: MediaCoverageWithRelations;
 };
 
 export default function MediaCard({ item }: MediaCardProps) {
+
+  const displayDate =
+    item.displayDate ??
+    item.publishedAt?.toLocaleDateString("en", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+
+
   return (
     <a
       href={`/media/${item.slug}`}
@@ -27,7 +37,7 @@ export default function MediaCard({ item }: MediaCardProps) {
         </h2>
 
         <p className="mt-2 text-sm font-semibold text-[var(--muted)]">
-          {item.eventName} · {item.date}
+          {item.eventName} · {displayDate}
         </p>
 
         <p className="mt-3 text-sm leading-6 text-[var(--muted)]">

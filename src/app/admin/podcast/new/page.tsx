@@ -1,11 +1,13 @@
 import PodcastAddForm from "@/components/admin/PodcastAddForm";
+import { requireRole } from "@/lib/auth/session";
 
-export default function AddPodcastPage() {
+export default async function AddPodcastPage() {
+  await requireRole("ADMIN");
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Add Podcast Episode</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="font-serif-display text-3xl font-bold text-[var(--ink)]">Add Podcast Episode</h1>
+        <p className="mt-1 text-[var(--muted)]">
           Enter the episode information and content below.
         </p>
       </div>

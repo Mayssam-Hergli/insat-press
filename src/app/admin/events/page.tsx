@@ -1,82 +1,79 @@
 import { getAllEvents } from "@/lib/data/events";
+import StatusBadge from "@/components/admin/StatusBadge";
+import DeleteEventButton from "@/components/admin/DeleteEventButton";
+import { requireRole } from "@/lib/auth/session";
 import Link from "next/link";
 
 export default async function AdminEventsPage() {
+  await requireRole("ADMIN");
   const events = await getAllEvents();
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Events</h1>
-        <Link
-          href="/admin/events/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-serif-display text-3xl font-bold text-[var(--ink)]">
+          Events
+        </h1>
+        <Link href="/admin/events/new" className="btn-editorial btn-editorial-sm">
           New Event
         </Link>
       </div>
 
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="paper-card rounded-[1.2rem] overflow-x-auto">
+        <table className="min-w-full divide-y divide-[var(--line)]">
+          <thead className="bg-[rgba(216,201,192,0.35)]">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-[0.18em] text-[var(--press-red)]">
                 Title
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-[0.18em] text-[var(--press-red)]">
                 Type
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-[0.18em] text-[var(--press-red)]">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-black uppercase tracking-[0.18em] text-[var(--press-red)]">
                 Updated
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-black uppercase tracking-[0.18em] text-[var(--press-red)]">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="divide-y divide-[var(--line)]">
             {events.map((event) => (
-              <tr key={event.id.toString()}>
+              <tr
+                key={event.id.toString()}
+                className="transition-colors hover:bg-[rgba(255,248,243,0.55)]"
+              >
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
+                  <div className="text-sm font-bold text-[var(--ink)]">
                     {event.title}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">{event.type}</div>
+                  <div className="text-sm text-[var(--muted)]">{event.type}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      event.status === "PUBLISHED"
-                        ? "bg-green-100 text-green-800"
-                        : event.status === "DRAFT"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {event.status}
-                  </span>
+                  <StatusBadge status={event.status} />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--muted)]">
                   {new Date(event.updatedAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link
                     href={`/admin/events/${event.id}/edit`}
-                    className="text-blue-600 hover:text-blue-900 mr-4"
+                    className="mr-4 font-bold text-[var(--press-red)] hover:underline"
                   >
                     Edit
                   </Link>
                   <Link
                     href={`/events/${event.slug}`}
-                    className="text-gray-600 hover:text-gray-900"
+                    className="mr-4 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
                   >
                     View
                   </Link>
+                  <DeleteEventButton id={event.id.toString()} />
                 </td>
               </tr>
             ))}

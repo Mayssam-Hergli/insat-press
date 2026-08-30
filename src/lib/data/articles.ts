@@ -16,10 +16,10 @@ const articleOrderBy = [
   { createdAt: "desc" },
 ] satisfies Prisma.ArticleOrderByWithRelationInput[];
 
-const articleWithWritersInclude = {
+const articleWithContributorsInclude = {
   writers: {
     include: {
-      writer: true,
+      profile: true,
     },
     orderBy: {
       sortOrder: "asc",
@@ -29,25 +29,27 @@ const articleWithWritersInclude = {
   updatedBy: true,
 } satisfies Prisma.ArticleInclude;
 
-export type ArticleWithWriters = Prisma.ArticleGetPayload<{
-  include: typeof articleWithWritersInclude;
+export type ArticleWithContributors = Prisma.ArticleGetPayload<{
+  include: typeof articleWithContributorsInclude;
 }>;
 
 export type ArticleFilters = PaginationOptions & {
   category?: string;
   status?: ContentStatus;
+  createdById?: string;
 };
 
 export function getAllArticles(
   filters: ArticleFilters = {}
-): Promise<ArticleWithWriters[]> {
+): Promise<ArticleWithContributors[]> {
   return runDataQuery("get all articles", () =>
     getPrisma().article.findMany({
       where: {
         category: filters.category,
         status: filters.status,
+        createdById: filters.createdById,
       },
-      include: articleWithWritersInclude,
+      include: articleWithContributorsInclude,
       orderBy: articleOrderBy,
       skip: filters.skip,
       take: filters.take,
@@ -57,37 +59,37 @@ export function getAllArticles(
 
 export function getPublishedArticles(
   options: PaginationOptions = {}
-): Promise<ArticleWithWriters[]> {
+): Promise<ArticleWithContributors[]> {
   return getAllArticles({ ...options, status: ContentStatus.PUBLISHED });
 }
 
-export function getArticleById(id: EntityId): Promise<ArticleWithWriters | null> {
+export function getArticleById(id: EntityId): Promise<ArticleWithContributors | null> {
   return runDataQuery(`get article by id ${String(id)}`, () =>
     getPrisma().article.findUnique({
       where: { id: toBigIntId(id) },
-      include: articleWithWritersInclude,
+      include: articleWithContributorsInclude,
     })
   );
 }
 
 export function getArticleBySlug(
   slug: string
-): Promise<ArticleWithWriters | null> {
+): Promise<ArticleWithContributors | null> {
   return runDataQuery(`get article by slug ${slug}`, () =>
     getPrisma().article.findUnique({
       where: { slug },
-      include: articleWithWritersInclude,
+      include: articleWithContributorsInclude,
     })
   );
 }
 
 export function getArticleByTitle(
   title: string
-): Promise<ArticleWithWriters | null> {
+): Promise<ArticleWithContributors | null> {
   return runDataQuery(`get article by title ${title}`, () =>
     getPrisma().article.findFirst({
       where: { title },
-      include: articleWithWritersInclude,
+      include: articleWithContributorsInclude,
       orderBy: articleOrderBy,
     })
   );
@@ -95,14 +97,14 @@ export function getArticleByTitle(
 
 export function getPublishedArticleBySlug(
   slug: string
-): Promise<ArticleWithWriters | null> {
+): Promise<ArticleWithContributors | null> {
   return runDataQuery(`get published article by slug ${slug}`, () =>
     getPrisma().article.findFirst({
       where: {
         slug,
         status: ContentStatus.PUBLISHED,
       },
-      include: articleWithWritersInclude,
+      include: articleWithContributorsInclude,
     })
   );
 }

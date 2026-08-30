@@ -1,9 +1,10 @@
 import Navbar from "@/components/shared/Navbar";
 import PageTitle from "@/components/shared/PageTitle";
 import MediaCard from "@/components/cards/MediaCard";
-import { mediaCoverage } from "@/data/mediaCoverage";
+import { getAllMediaCoverage } from "@/lib/data/mediaCoverage";
 
-export default function MediaPage() {
+export default async function MediaPage() {
+  const mediaCoverage = await getAllMediaCoverage();
   return (
     <main className="min-h-screen page-bg">
       <Navbar />

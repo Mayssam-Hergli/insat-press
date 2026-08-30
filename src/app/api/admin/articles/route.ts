@@ -1,44 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth/session";
-import { canEdit } from "@/lib/auth/permissions";
-import { createArticle,getArticleByTitle } from "@/lib/data/articles";
+import { getCurrentProfile } from "@/lib/auth/session";
+import { canAccessSection } from "@/lib/auth/permissions";
+import { ArticleInputError, parseNewArticleInput } from "@/lib/articles/input";
+import { createArticle, getArticleBySlug, getArticleByTitle } from "@/lib/data/articles";
+import { setArticleWriters } from "@/lib/data/articleWriters";
 
-export async function POST(
-  request: NextRequest
-) {
+export async function POST(request: NextRequest) {
   try {
-    // Check authentication and permissions
-    const profile = await requireAuth();
-    if (!canEdit(profile.role)) {
-      return NextResponse.json(
-        { error: "Insufficient permissions" },
-        { status: 403 }
-      );
+    const profile = await getCurrentProfile();
+    if (!profile) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    if (!canAccessSection(profile.role, "articles")) {
+      return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 });
     }
+
     const body = await request.json();
+    const writerIds = Array.isArray(body.writerIds)
+      ? body.writerIds.filter((value: unknown): value is string => typeof value === "string")
+      : [];
+    const { data } = parseNewArticleInput(body);
+    const duplicate = (await getArticleByTitle(data.title)) || (await getArticleBySlug(data.slug));
+    if (duplicate) return NextResponse.json({ error: "An article with this title or slug already exists" }, { status: 409 });
 
-    // Verify article exists
-    const article = await getArticleByTitle(body.title);
-    if (article) {
-      return NextResponse.json(
-        { error: "Article exists" },
-        { status: 404 }
-      );
-    }
-
-    // Update the article
-    const newArticle = await createArticle( {
-      ...body,
-      updatedById: profile.id,
+    // Creation is deliberately a draft. The client uploads its cover to this
+    // stable article ID, then requests the desired status in a separate PATCH.
+    const article = await createArticle({
+      ...data,
+      status: "DRAFT",
+      publishedAt: null,
+      createdBy: { connect: { id: profile.id } },
+      updatedBy: { connect: { id: profile.id } },
     });
-
-    return NextResponse.json(newArticle, { status: 200 });
+    await setArticleWriters(article.id, writerIds);
+    return NextResponse.json({ ...article, id: article.id.toString() }, { status: 201 });
   } catch (error) {
-    console.error("Update article error:", error);
-    return NextResponse.json(
-      { errorr: "Failed to add article" },
-      { status: 500 }
-    );
+    if (error instanceof ArticleInputError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    console.error("Create article error:", error);
+    return NextResponse.json({ error: "Failed to add article" }, { status: 500 });
   }
 }
-

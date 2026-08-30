@@ -9,6 +9,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+package-lock.json
 
 # testing
 /coverage
@@ -46,6 +47,9 @@ next-env.d.ts
 # IDE / editor
 .idea/
 .vscode/
+
+#claude
+.claude/
 
 # scratch notes / planning docs
 AUTH_FIX.md

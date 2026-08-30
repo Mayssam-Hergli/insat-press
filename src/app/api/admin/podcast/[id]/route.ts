@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/session";
-import { canEdit } from "@/lib/auth/permissions";
+import { isAdmin } from "@/lib/auth/permissions";
 import {
+  deletePodcastEpisode,
   updatePodcastEpisode,
   getPodcastEpisodeById,
 } from "@/lib/data/podcastEpisodes";
@@ -13,7 +14,7 @@ export async function PATCH(
   try {
     // Check authentication and permissions
     const profile = await requireAuth();
-    if (!canEdit(profile.role)) {
+    if (!isAdmin(profile.role)) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
         { status: 403 }
@@ -55,7 +56,7 @@ export async function DELETE(
   try {
     // Check authentication and permissions
     const profile = await requireAuth();
-    if (!canEdit(profile.role)) {
+    if (!isAdmin(profile.role)) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
         { status: 403 }
@@ -64,12 +65,16 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Note: Actual deletion would require canDelete permission
-    // For now, this is a placeholder
-    return NextResponse.json(
-      { error: "Delete functionality not yet implemented" },
-      { status: 501 }
-    );
+    const episode = await getPodcastEpisodeById(id);
+    if (!episode) {
+      return NextResponse.json(
+        { error: "Podcast episode not found" },
+        { status: 404 }
+      );
+    }
+
+    await deletePodcastEpisode(id);
+    return NextResponse.json({ deleted: true });
   } catch (error) {
     console.error("Delete podcast episode error:", error);
     return NextResponse.json(
