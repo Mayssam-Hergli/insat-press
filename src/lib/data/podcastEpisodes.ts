@@ -77,6 +77,17 @@ export function getPodcastEpisodeBySlug(
   );
 }
 
+export function getPublishedPodcastEpisodeBySlug(
+  slug: string
+): Promise<PodcastEpisodeWithEditors | null> {
+  return runDataQuery(`get published podcast episode by slug ${slug}`, () =>
+    getPrisma().podcastEpisode.findFirst({
+      where: { slug, status: ContentStatus.PUBLISHED },
+      include: podcastWithEditorsInclude,
+    })
+  );
+}
+
 export function getPodcastEpisodeByTitle(
   title: string
 ): Promise<PodcastEpisodeWithEditors | null> {

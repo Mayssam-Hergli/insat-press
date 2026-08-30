@@ -72,6 +72,15 @@ export function getEventBySlug(slug: string): Promise<EventWithEditors | null> {
   );
 }
 
+export function getPublishedEventBySlug(slug: string): Promise<EventWithEditors | null> {
+  return runDataQuery(`get published event by slug ${slug}`, () =>
+    getPrisma().event.findFirst({
+      where: { slug, status: ContentStatus.PUBLISHED },
+      include: eventWithEditorsInclude,
+    })
+  );
+}
+
 export function getEventByTitle(title: string): Promise<EventWithEditors | null> {
   return runDataQuery(`get event by title ${title}`, () =>
     getPrisma().event.findFirst({

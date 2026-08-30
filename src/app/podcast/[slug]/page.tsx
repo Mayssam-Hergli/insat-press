@@ -1,23 +1,29 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/shared/Navbar";
-import { podcasts } from "@/data/podcasts";
+import PodcastContent from "@/components/podcast/PodcastContent";
+import { getPublishedPodcastEpisodeBySlug } from "@/lib/data/podcastEpisodes";
 
 type PodcastEpisodePageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return podcasts.map((episode) => ({ slug: episode.slug }));
-}
-
 export default async function PodcastEpisodePage({
   params,
 }: PodcastEpisodePageProps) {
   const { slug } = await params;
-  const episode = podcasts.find((p) => p.slug === slug);
+  const episode = await getPublishedPodcastEpisodeBySlug(slug);
 
   if (!episode) notFound();
+
+  const date =
+    episode.displayDate ??
+    episode.releasedAt?.toLocaleDateString("en", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }) ??
+    "";
 
   return (
     <main className="min-h-screen page-bg">
@@ -37,7 +43,7 @@ export default async function PodcastEpisodePage({
             <div>
               <p className="text-sm font-bold text-[var(--muted)]">
                 <span className="text-[var(--press-red)]">{episode.host}</span>{" "}
-                · Guest: {episode.guest} · {episode.date}
+                · Guest: {episode.guest} · {date}
               </p>
 
               <h1 className="font-serif-display mt-4 text-5xl font-bold leading-[1.05] text-[var(--press-red)] md:text-6xl">
@@ -83,10 +89,8 @@ export default async function PodcastEpisodePage({
           </section>
 
           {/* Show notes */}
-          <section className="mx-auto mt-10 max-w-3xl space-y-6 text-lg leading-9 text-[var(--ink)]">
-            {episode.content.map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
-            ))}
+          <section className="mx-auto mt-10 max-w-3xl">
+            <PodcastContent content={episode.content} />
           </section>
         </div>
       </article>
