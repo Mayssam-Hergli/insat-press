@@ -46,7 +46,6 @@ export default function Footer() {
 
         <div className="mt-8 flex flex-col gap-3 border-t border-[var(--line)] pt-5 text-sm font-semibold text-[var(--muted)] md:flex-row md:items-center md:justify-between">
           <p>© 2026 INSAT Press. All rights reserved.</p>
-          <p>Made by Mayssam Hergli & Israa Soudani .</p>
         </div>
       </div>
     </footer>
