@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth/session";
+import { getCurrentProfile } from "@/lib/auth/session";
 import { isAdmin } from "@/lib/auth/permissions";
 import {
   deletePodcastEpisode,
@@ -13,7 +13,8 @@ export async function PATCH(
 ) {
   try {
     // Check authentication and permissions
-    const profile = await requireAuth();
+    const profile = await getCurrentProfile();
+    if (!profile) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     if (!isAdmin(profile.role)) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
@@ -55,7 +56,8 @@ export async function DELETE(
 ) {
   try {
     // Check authentication and permissions
-    const profile = await requireAuth();
+    const profile = await getCurrentProfile();
+    if (!profile) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     if (!isAdmin(profile.role)) {
       return NextResponse.json(
         { error: "Insufficient permissions" },

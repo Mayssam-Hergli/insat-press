@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth/session";
+import { getCurrentProfile } from "@/lib/auth/session";
 import { canManageProfiles } from "@/lib/auth/permissions";
 import { getProfileById } from "@/lib/data/profiles";
 import { getAuthUsersMap, inviteUserByEmail } from "@/lib/auth/supabase-admin";
@@ -9,7 +9,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const profile = await requireAuth();
+    const profile = await getCurrentProfile();
+    if (!profile) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     if (!canManageProfiles(profile.role)) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
