@@ -1,10 +1,15 @@
+import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import PageTitle from "@/components/shared/PageTitle";
 import WritingBrowser from "@/components/writing/WritingBrowser";
 import { getPublishedArticles } from "@/lib/data/articles";
+import { getCurrentProfile } from "@/lib/auth/session";
 
 export default async function WritingPage() {
-  const articles = await getPublishedArticles();
+  const [articles, profile] = await Promise.all([
+    getPublishedArticles(),
+    getCurrentProfile(),
+  ]);
   const browserArticles = articles.map((article) => ({
     slug: article.slug,
     title: article.title,
@@ -25,6 +30,14 @@ export default async function WritingPage() {
 
       <section className="px-6 py-7 md:px-12 md:py-8 lg:px-20">
         <div className="mx-auto max-w-6xl">
+          {profile?.role === "WRITER" && (
+            <div className="mb-4 flex justify-end">
+              <Link href="/admin/articles/new" className="btn-editorial btn-editorial-sm">
+                + Add Article
+              </Link>
+            </div>
+          )}
+
           <PageTitle title="Writing Department" compact />
 
     

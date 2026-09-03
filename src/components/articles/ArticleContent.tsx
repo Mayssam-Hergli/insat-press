@@ -1,5 +1,6 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 
 function toMarkdownString(value: unknown): string {
   if (typeof value === "string") return value;
@@ -11,7 +12,7 @@ function toMarkdownString(value: unknown): string {
 export default function ArticleContent({ content }: { content: unknown }) {
   return (
     <div className="markdown-preview article-body max-w-none text-[var(--ink)]">
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{toMarkdownString(content)}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{toMarkdownString(content)}</ReactMarkdown>
     </div>
   );
 }

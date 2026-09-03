@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Navbar from "@/components/shared/Navbar";
 import ArticleCoverImage from "@/components/articles/ArticleCoverImage";
 import ArticleContent from "@/components/articles/ArticleContent";
+import ArticleByline from "@/components/articles/ArticleByline";
 import { getPublishedArticleBySlug } from "@/lib/data/articles";
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -10,7 +11,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const article = await getPublishedArticleBySlug(slug);
   if (!article) notFound();
 
-  const writers = article.writers.map(({ profile }) => profile.fullName ?? profile.email).join(", ") || "INSAT Press";
+  const writers = article.writers.map(({ profile }) => profile);
   const date = article.displayDate ?? article.publishedAt?.toLocaleDateString("en", { year: "numeric", month: "long", day: "numeric" }) ?? "";
   const wordCount = typeof article.content === "string"
     ? article.content.trim().split(/\s+/).filter(Boolean).length
@@ -38,9 +39,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <p className="mt-5 max-w-3xl text-lg font-medium leading-8 text-[var(--muted)] md:text-xl">
                 {article.description}
               </p>
-              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
-                <p><span className="text-[var(--muted)]">By</span> <strong className="text-[var(--ink)]">{writers}</strong></p>
-                {date && <p className="text-[var(--muted)]">{date}</p>}
+              <div className="mt-7">
+                {writers.length > 0 ? (
+                  <ArticleByline writers={writers} />
+                ) : (
+                  <p className="text-sm"><span className="text-[var(--muted)]">By</span> <strong className="text-[var(--ink)]">INSAT Press</strong></p>
+                )}
+                {date && <p className="mt-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--muted)]">{date}</p>}
               </div>
             </div>
           </div>

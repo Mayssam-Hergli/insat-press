@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 
 type MarkdownEditorProps = {
   value: string;
@@ -137,7 +138,7 @@ export default function MarkdownEditor({
           className="markdown-preview overflow-auto bg-[rgba(239,226,217,0.5)] px-4 py-3 text-sm"
         >
           {text.trim() ? (
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{text}</ReactMarkdown>
           ) : (
             <p className="markdown-preview-empty">Preview appears here…</p>
           )}
